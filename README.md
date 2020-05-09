@@ -40,7 +40,7 @@ l2 = EtherFrame("AA:BB:CC:DD:EE:FF", "00:11:22:33:44:55", arp, type="arp")
 nic.send(l2)
 ```
 ## Using ARPMap
-This script leverages the power of networkingpy, sending out ARP requests across the entire subnet to map out what hosts are on the network.
+This script leverages the power of networkingpy, sending out ARP requests across the entire subnet to map out what hosts are on the network. It is intended to be executed from the command line.
 
 In directory arpmap.py is in, call
 ```
@@ -54,13 +54,13 @@ You will then be prompted for:
 
 **Interface** - Name of interface to send ARP requests out of
 
-**Network** - Network address of subnet you wish to map
+**Network** - Network address of subnet you wish to map. Ex: 192.168.1.0
 
-**Prefix** - Subnet mask prefix, values 8 - 32
+**Prefix** - Subnet mask prefix, values 8 - 32. Ex: 24
 
-**Random** - 'y' or 'n', whether you want requests to be sent randomly or in order
+**Random** - 'y' or 'n', whether you want requests to be sent randomly or in order Ex: n
 
-**Delay** - float value of delay between requests in seconds - to be used for slowing down network flood
+**Delay** - float value of delay between requests in seconds - to be used for slowing down network flood Ex: 0.01
 
 
 Then it sends requests, and prints the MAC, IP, and Manufacturer of hosts that reply.
