@@ -1,2 +1,41 @@
 # networkingpy
-Provide easy access to forming and sending custom Ethernet frame, ARP messages, IPv4 packets, and TCP/UDP Segments
+Provides easy access to forming and sending custom Ethernet frame, ARP messages, IPv4 packets, and TCP/UDP Segments
+
+## Getting Started
+To confirm what you are sending, open up a network analysis tool like Wireshark.
+
+### Sending data over TCP
+
+The general structure is to first create a Raw_NIC - this is a wrapper class around a Python raw socket. 
+Then from application layer (in this case just a string) to layer 2, create what you are going to send.
+The order in which you create objects to send should be from the most encapsulated data to least -
+
+
+```nic = Raw_NIC("eth0")
+payload = "The quick brown fox jumps over the lazy dog" #String payload
+nic = Raw_NIC("eth0")   #Create Raw_NIC - replace interface name with your interface
+# Creates TCP segment. IPs needed to calcualte checksum:
+l4_tcp = TCP(50000, 50001, "192.168.1.1", "192.168.1.2", 1024, payload) # Change 1st ip to yours, 2nd to target.
+# Creates IPv4 packet:
+l3 = IPv4("192.168.1.1", "192.168.1.2", l4_tcp, protocol="tcp") # Change 1st ip to yours, 2nd to target
+l2 = EtherFrame("AA:BB:CC:DD:EE:FF", "00:11:22:33:44:55", l3) # Change 1st mac to yours, 2nd to target
+nic.send(l2) # Send payload - open up Wireshark to see your payload
+ ```
+ 
+ In this example, l4_tcp, a TCP instance takes our string as payload. This is then put into l3, an IPv4 instance. l3 is then placed into l2, an EtherFrame instance. 
+ 
+Every field and flag in these protocols can be changed, or left at their default values.
+
+
+### Sending an ARP request
+This works the similiar to sending data over TCP - we just replace an IPv4 instance with an ARP instance
+Note how we have to change the EtherFrame type.
+
+```nic = Raw_NIC("eth0")
+# Creates ARP request to find IP Change 1st MAC to your MAC, 1st IP to yours, 2nd IP to IP you are asking about
+arp = ARP("AA:BB:CC:DD:EE:FF", "192.168.1.1", BROADCAST_MAC, "192.168.1.2")
+l2 = EtherFrame("AA:BB:CC:DD:EE:FF", "00:11:22:33:44:55", arp, type="arp")
+nic.send(l2)
+```
+
+
