@@ -40,6 +40,9 @@ l2 = EtherFrame("AA:BB:CC:DD:EE:FF", "00:11:22:33:44:55", arp, type="arp")
 nic.send(l2)
 ```
 ## Using ARPMap
+![](docs/images/arp_map.png)
+
+
 This script leverages the power of networkingpy, sending out ARP requests across the entire subnet to map out what hosts are on the network. It is intended to be executed from the command line.
 
 In directory arpmap.py is in, call
@@ -64,3 +67,4 @@ You will then be prompted for:
 
 
 Then it sends requests, and prints the MAC, IP, and Manufacturer of hosts that reply.
+
