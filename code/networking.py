@@ -10,6 +10,7 @@ import subprocess
 import sys
 from socket import *
 from threading import Thread
+from ipaddress import IPv6Address, AddressValueError
 import csv
 
 __author__ = "Matt Baker"
@@ -510,6 +511,9 @@ class IPv4:
     def __init__(self, src, dst, payload, id=0, df=False, mf=False, offset=0, ttl=64, protocol="tcp", dscp=0, ecn=0,
                  version=4):
         """init for IPv4"""
+        if ttl > 255 or ttl < 0:
+            raise ValueError("ttl should be value between 0 and 255 inclusive")
+
         self.version = version
         # How many 32 bit words in header - currently options at end of header not supported
         self.ihl = 5
@@ -632,6 +636,80 @@ class IPv4:
         returnable.checksum = checksum
         return returnable
 
+class IPv6:
+    """
+    Creates IPv6 object from parameters
+    :param src: source IPv6 address
+    :param dst: destination IPv6 address
+    :param next: next header - string - default "tcp". "udp" and "icmp" also supported
+    :param limit: hop count limit - 0 to 255 inclusive
+    :param flow_label: label for which flow packet belongs to - default is 0 - none
+    :param ds: Differentiated Services field
+    :param ecn: - Explicit Congestion Notification value
+    :param version: IP version: default of 6
+    """
+
+    def __init__(self, src, dst, payload, next="tcp", limit=64, flow_label=0, ds=0, ecn=0, version=6):
+        """init for IPv6"""
+        try:
+            IPv6Address(src)
+        except AddressValueError:
+            raise ValueError("src must be valid IPv6 address")
+
+        try:
+            IPv6Address(dst)
+        except AddressValueError:
+            raise ValueError("dst must be valid IPv6 address")
+
+        if limit > 255 or limit < 0:
+            raise ValueError("limit should be value between 0 and 255 inclusive")
+        if ds < 0 or ds > 3:
+            raise ValueError("ds should be value between 0 and 3 inclusive")
+        try:
+            self.length = len(payload.to_payload())
+        except AttributeError:
+            self.length = len(payload)
+
+        self.next = IPv4.protocols_to_int.get(str(next).lower())
+        # Until time for error handling, trust users custom input - must be integer
+        if self.next is None:
+            self.next = next
+
+        self.src = src
+        self.dst = dst
+        self.limit = limit
+        self.version = version
+        self.ds = ds
+        self.ecn = ecn
+        self.flow_label = flow_label
+        self.length = 0
+        self.payload = payload
+
+    def to_payload(self):
+        first_byte = ((self.version << 4) + (self.ds >> 2)).to_bytes(1, 'big')
+        second_byte = ((self.ecn << 6) + (self.flow_label >> 16)).to_bytes(1, 'big')
+        flow_label_bytes = (self.flow_label << 4).to_bytes(2, 'big')
+
+        # Total length of packet, header included
+        #try:
+
+        self.length = len(self.payload.to_payload())
+        #except AttributeError:
+        #    print("here")
+        #    self.length = len(self.payload)
+
+        length_bytes = self.length.to_bytes(2, 'big')
+        next_bytes = self.next.to_bytes(1, 'big')
+        limit_bytes = self.limit.to_bytes(1, 'big')
+        src_bytes = IPv6Address(self.src).packed
+        dst_bytes = IPv6Address(self.dst).packed
+        try:
+            payload = self.payload.to_payload()
+        except AttributeError:
+            payload = str.encode(self.payload)
+        return first_byte + second_byte + flow_label_bytes + length_bytes + next_bytes + limit_bytes + src_bytes + \
+               dst_bytes + payload
+
 
 class UDP:
     """
@@ -683,6 +761,7 @@ class UDP:
         checksum_bytes = self.checksum.to_bytes(2, 'big')
 
         return src_prt + dst_prt + length + checksum_bytes + payload
+
 
     @classmethod
     def udp_parser(cls, data):
