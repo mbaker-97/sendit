@@ -889,24 +889,24 @@ if __name__ == '__main__':
     # Or call provided method get_ip(interface)
 
     # Uncomment code from here
-    payload = "The quick brown fox jumps over the lazy dog"  # String payload
-    nic = Raw_NIC("wlan0")  # Create Raw_NIC - replace interface name with your interface
+    # payload = "The quick brown fox jumps over the lazy dog"  # String payload
+    # nic = Raw_NIC("wlan0")  # Create Raw_NIC - replace interface name with your interface
     # Creates TCP segment. IPs needed to calcualte checksum:
-    l4_tcp = TCP(50000, 50001, "192.168.1.1", "192.168.1.2", 1024, payload)  # Change 1st ip to yours, 2nd to target.
+    # l4_tcp = TCP(50000, 50001, "192.168.1.1", "192.168.1.2", 1024, payload)  # Change 1st ip to yours, 2nd to target.
     # Creates IPv4 packet:
-    l3 = IPv4("192.168.1.1", "192.168.1.2", l4_tcp, protocol="tcp")  # Change 1st ip to yours, 2nd to target
+    # l3 = IPv4("192.168.1.1", "192.168.1.2", l4_tcp, protocol="tcp")  # Change 1st ip to yours, 2nd to target
     # Creates Etherframe:
-    l2 = EtherFrame("AA:BB:CC:DD:EE:FF", "00:11:22:33:44:55", l3)  # Change 1st mac to yours, 2nd to target
-    nic.send(l2)  # Send payload - open up Wireshark to see your payload
+    # l2 = EtherFrame("AA:BB:CC:DD:EE:FF", "00:11:22:33:44:55", l3)  # Change 1st mac to yours, 2nd to target
+    # nic.send(l2)  # Send payload - open up Wireshark to see your payload
     # To Here
 
     # Example 2 - change payload to use UDP
 
     # Uncomment code from here
-    l4_udp = UDP(50000, 50001, "192.168.1.1", "192.168.1.2", payload)  # Create UDP object
-    l2.payload.payload = l4_udp  # Change l3 (and IPv4 packet) payload to new UDP object
-    l2.payload.protocol = IPv4.protocols_to_int.get("udp")  # Change l3 protocol to now say payload contains UDP segment
-    nic.send(l2)  # Send new frame with UDP segment
+    # l4_udp = UDP(50000, 50001, "192.168.1.1", "192.168.1.2", payload)  # Create UDP object
+    # l2.payload.payload = l4_udp  # Change l3 (and IPv4 packet) payload to new UDP object
+    # l2.payload.protocol = IPv4.protocols_to_int.get("udp")  # Change l3 protocol to now say payload contains UDP segment
+    # nic.send(l2)  # Send new frame with UDP segment
     # To Here
 
     # Example 3 - change payload to send ARP request
