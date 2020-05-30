@@ -12,7 +12,6 @@ from socket import *
 from threading import Thread
 import csv
 
-
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
@@ -263,15 +262,17 @@ def checksum(message):
     return total ^ 65535
 
 
-def form_pseudo_header(src_ip, dst_ip, length):
+def form_ipv4_pseudo_header(src_ip, dst_ip, length, protocol):
     """
     Form TCP/UDP pseudoheader for checksum calculation
+    :param protocol: L4 Protocol - currently only support tcp and udp
     :param src_ip: source ip
     :param dst_ip: destination ip
     :param length: length of tcp segment, header included
     :return: pseudoheader in bytes
     """
-    ip_protocol = 6
+    ip_protocol = IPv4.protocols_to_int.get(protocol.lower())
+
     return inet_aton(src_ip) + inet_aton(dst_ip) + ip_protocol.to_bytes(2, 'big') + length.to_bytes(2, 'big')
 
 
@@ -431,6 +432,7 @@ class ARP:
     :param op: opcode of arp message - default to 1 for request
     :raise ValueError if opcode is not between 1 and 9 inclusive
     """
+
     def __init__(self, sha, spa, tha, tpa, hrd=1, pro=2048, hln=6, pln=4, op=1):
         """Init for ARP"""
         if op > 9 or op < 1:
@@ -574,7 +576,7 @@ class IPv4:
         check = self.checksum.to_bytes(2, 'big')
         return first_byte + second_byte + length + identification + frag_bytes + time_to_live + protocol + check + src \
                + dst + payload
-    
+
     @classmethod
     def ipv4_parser(cls, data):
         """
@@ -642,22 +644,24 @@ class UDP:
     :raise ValueError if src is not valid src port number
     :raise ValueError if dst is not valid dst port number
     """
-    def __init__(self, src, dst, payload):
 
-        if src > 65535 or src < 0:
-            raise ValueError("src must be valid UDP port")
-        if dst > 65535 or dst < 0:
-            raise ValueError("dst must be valid UDP port")
+    def __init__(self, src_prt, dst_prt, src_ip, dst_ip, payload):
 
-        self.src = src
-        self.dst = dst
+        if src_prt > 65535 or src_prt < 0:
+            raise ValueError("src_prt must be valid UDP port")
+        if dst_prt > 65535 or dst_prt < 0:
+            raise ValueError("dst_prt must be valid UDP port")
+
+        self.src_prt = src_prt
+        self.dst_prt = dst_prt
+        self.src_ip = src_ip
+        self.dst_ip = dst_ip
         self.payload = payload
         # Length of payload + header
         # Header is 8 bytes long
         self.length = (len(self.payload) + 8)
 
-        # Checksum not required for UDP, currently not supported
-        # TODO
+        # Set to zero
         self.checksum = 0
 
     def to_payload(self):
@@ -667,12 +671,18 @@ class UDP:
         checksum is currently 0 - not implemented
         :return: - bytes representation of UDP
         """
-        src = self.src.to_bytes(2, 'big')
-        dst = self.dst.to_bytes(2, 'big')
+        src_prt = self.src_prt.to_bytes(2, 'big')
+        dst_prt = self.dst_prt.to_bytes(2, 'big')
         length = self.length.to_bytes(2, 'big')
-        checksum = self.checksum.to_bytes(2, 'big')
+        payload = self.payload.encode()
+        pseudo = form_ipv4_pseudo_header(self.src_ip, self.dst_ip, self.length, "udp")
 
-        return src + dst + length + checksum + self.payload.encode()
+        if self.checksum == 0:
+            self.checksum = checksum(pseudo + src_prt + dst_prt + length + payload)
+
+        checksum_bytes = self.checksum.to_bytes(2, 'big')
+
+        return src_prt + dst_prt + length + checksum_bytes + payload
 
     @classmethod
     def udp_parser(cls, data):
@@ -688,7 +698,7 @@ class UDP:
         checksum = int.from_bytes(data[6:8], 'big')
         payload = data[8:].decode("ascii")
 
-        returnable = UDP(src, dst, payload)
+        returnable = UDP(src, dst, "0.0.0.0", "0.0.0.0", payload)
         returnable.length = length
         returnable.checksum = checksum
         return returnable
@@ -765,7 +775,6 @@ class TCP:
         self.dst_ip = dst_ip
         self.checksum = 0
 
-
     def to_payload(self):
         """
         Converts TCP to proper format of payload bytes to send
@@ -807,18 +816,18 @@ class TCP:
 
         # Create pseudo header
         # Assume length of tcp header is 20 bytes
-        pseudo = form_pseudo_header(self.src_ip, self.dst_ip, len(self.payload) + 20)
+        pseudo = form_ipv4_pseudo_header(self.src_ip, self.dst_ip, len(self.payload) + 20, "tcp")
         payload = self.payload.encode()
         # Check if checksum has been manually set
         if self.checksum == 0:
-            self.checksum = checksum(pseudo + src_prt + dst_prt + sqn + ack_num + offset_byte + flags_bytes + window_bytes +
-                                     urgent_pnt_bytes + payload)
+            self.checksum = checksum(
+                pseudo + src_prt + dst_prt + sqn + ack_num + offset_byte + flags_bytes + window_bytes +
+                urgent_pnt_bytes + payload)
 
         checksum_bytes = self.checksum.to_bytes(2, 'big')
 
         return src_prt + dst_prt + sqn + ack_num + offset_byte + flags_bytes + window_bytes + checksum_bytes + \
-            urgent_pnt_bytes + payload
-
+               urgent_pnt_bytes + payload
 
     @classmethod
     def tcp_parser(cls, data):
@@ -880,24 +889,24 @@ if __name__ == '__main__':
     # Or call provided method get_ip(interface)
 
     # Uncomment code from here
-    # payload = "The quick brown fox jumps over the lazy dog" #String payload
-    # nic = Raw_NIC("eth0")   #Create Raw_NIC - replace interface name with your interface
+    payload = "The quick brown fox jumps over the lazy dog"  # String payload
+    nic = Raw_NIC("wlan0")  # Create Raw_NIC - replace interface name with your interface
     # Creates TCP segment. IPs needed to calcualte checksum:
-    # l4_tcp = TCP(50000, 50001, "192.168.1.1", "192.168.1.2", 1024, payload) # Change 1st ip to yours, 2nd to target.
+    l4_tcp = TCP(50000, 50001, "192.168.1.1", "192.168.1.2", 1024, payload)  # Change 1st ip to yours, 2nd to target.
     # Creates IPv4 packet:
-    # l3 = IPv4("192.168.1.1", "192.168.1.2", l4_tcp, protocol="tcp") # Change 1st ip to yours, 2nd to target
+    l3 = IPv4("192.168.1.1", "192.168.1.2", l4_tcp, protocol="tcp")  # Change 1st ip to yours, 2nd to target
     # Creates Etherframe:
-    # l2 = EtherFrame("AA:BB:CC:DD:EE:FF", "00:11:22:33:44:55", l3) # Change 1st mac to yours, 2nd to target
-    # nic.send(l2) # Send payload - open up Wireshark to see your payload
+    l2 = EtherFrame("AA:BB:CC:DD:EE:FF", "00:11:22:33:44:55", l3)  # Change 1st mac to yours, 2nd to target
+    nic.send(l2)  # Send payload - open up Wireshark to see your payload
     # To Here
 
     # Example 2 - change payload to use UDP
 
     # Uncomment code from here
-    # l4_udp = UDP(50000, 50001, payload) # Create UDP object
-    # l2.payload.payload = l4_udp # Change l3 (and IPv4 packet) payload to new UDP object
-    # l2.payload.protocol = IPv4.protocols.get("udp") # Change l3 protocol to now say payload contains UDP segment
-    # nic.send(l2) # Send new frame with UDP segment
+    l4_udp = UDP(50000, 50001, "192.168.1.1", "192.168.1.2", payload)  # Create UDP object
+    l2.payload.payload = l4_udp  # Change l3 (and IPv4 packet) payload to new UDP object
+    l2.payload.protocol = IPv4.protocols_to_int.get("udp")  # Change l3 protocol to now say payload contains UDP segment
+    nic.send(l2)  # Send new frame with UDP segment
     # To Here
 
     # Example 3 - change payload to send ARP request
@@ -909,4 +918,3 @@ if __name__ == '__main__':
     # l2.type = "arp" # Sets Ethertype to ARP
     # nic.send(l2) # Send new frame with ARP Request - open Wireshark to look for response!
     # To Here
-
