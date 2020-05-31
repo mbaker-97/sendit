@@ -157,7 +157,6 @@ def bytes_to_MAC(address):
     return (addr[0:2] + ":" + addr[2:4] + ":" + addr[4:6] + ":" + addr[6:8] + ":" + addr[8:10] + ":" + addr[
                                                                                                        10:12]).upper()
 
-
 def is_valid_ipv4(address):
     """
     Determines if address if valid IPv4 address
@@ -263,9 +262,10 @@ def checksum(message):
     return total ^ 65535
 
 
-def form_ipv4_pseudo_header(src_ip, dst_ip, length, protocol):
+def form_pseudo_header(src_ip, dst_ip, length, protocol, version=4):
     """
     Form TCP/UDP pseudoheader for checksum calculation
+    :param version: IP version - default is 4
     :param protocol: L4 Protocol - currently only support tcp and udp
     :param src_ip: source ip
     :param dst_ip: destination ip
@@ -273,8 +273,13 @@ def form_ipv4_pseudo_header(src_ip, dst_ip, length, protocol):
     :return: pseudoheader in bytes
     """
     ip_protocol = IPv4.protocols_to_int.get(protocol.lower())
-
-    return inet_aton(src_ip) + inet_aton(dst_ip) + ip_protocol.to_bytes(2, 'big') + length.to_bytes(2, 'big')
+    if version == 4:
+        return inet_aton(src_ip) + inet_aton(dst_ip) + ip_protocol.to_bytes(2, 'big') + length.to_bytes(2, 'big')
+    elif version == 6:
+        return IPv6Address(src_ip).packed + IPv6Address(dst_ip).packed + length.to_bytes(
+            4, 'big') + ip_protocol.to_bytes(2, 'big')
+    else:
+        raise ValueError("Invalid version number")
 
 
 class Raw_NIC(socket):
@@ -411,6 +416,8 @@ class EtherFrame:
         # If IPv4, parse IPv4
         elif type == "ipv4":
             payload = IPv4.ipv4_parser(rest)
+        elif type == "ipv6":
+            payload = IPv6.ipv6_parser(rest)
         else:
             payload = data[14:]
 
@@ -548,7 +555,7 @@ class IPv4:
         If self.payload is TCP or UDP object, their to_payload function is called, providing the conversion of payload
         to properly formated bytes to be inserted into packet
         If self.payload is not TCP or UDP object, self.payload is converted to bytes with str.encode(self.payload)
-        :return: - bytes representation of EtherFrame
+        :return: - bytes representation of IPv4 Packet
         """
         first_byte = int(bin(self.version)[2:].zfill(4) + bin(self.ihl)[2:].zfill(4), 2).to_bytes(1, 'big')
         second_byte = int(bin(self.dscp)[2:].zfill(6) + bin(self.ecn)[2:].zfill(2), 2).to_bytes(1, 'big')
@@ -585,7 +592,7 @@ class IPv4:
     def ipv4_parser(cls, data):
         """
         Class Method that parses group of bytes to create IPv4 Object
-        :param data: etherframe passed in as bytes
+        :param data: ipv4 packet passed in as bytes
         If protocol is "TCP", payload will be TCP object created
         If protocol is "UDP", payload will be UDP object created
         :return: IPv4 instance that contains the values that was in data
@@ -636,6 +643,7 @@ class IPv4:
         returnable.checksum = checksum
         return returnable
 
+
 class IPv6:
     """
     Creates IPv6 object from parameters
@@ -651,20 +659,23 @@ class IPv6:
 
     def __init__(self, src, dst, payload, next="tcp", limit=64, flow_label=0, ds=0, ecn=0, version=6):
         """init for IPv6"""
+        # Check validity of addresses
         try:
             IPv6Address(src)
         except AddressValueError:
             raise ValueError("src must be valid IPv6 address")
-
         try:
             IPv6Address(dst)
         except AddressValueError:
             raise ValueError("dst must be valid IPv6 address")
 
+        # Check validity of hop limit
         if limit > 255 or limit < 0:
             raise ValueError("limit should be value between 0 and 255 inclusive")
-        if ds < 0 or ds > 3:
-            raise ValueError("ds should be value between 0 and 3 inclusive")
+
+        # Check validity of ecn
+        if ecn < 0 or ecn > 3:
+            raise ValueError("ecn should be value between 0 and 3 inclusive")
         try:
             self.length = len(payload.to_payload())
         except AttributeError:
@@ -686,17 +697,21 @@ class IPv6:
         self.payload = payload
 
     def to_payload(self):
+        """
+        Converts IPv6 to proper format of payload bytes to send set as EtherFrame payload
+        If self.payload is TCP or UDP object, their to_payload function is called, providing the conversion of payload
+        to properly formated bytes to be inserted into packet
+        If self.payload is not TCP or UDP object, self.payload is converted to bytes with str.encode(self.payload)
+        :return: - bytes representation of IPv6 Packet
+        """
         first_byte = ((self.version << 4) + (self.ds >> 2)).to_bytes(1, 'big')
-        second_byte = ((self.ecn << 6) + (self.flow_label >> 16)).to_bytes(1, 'big')
-        flow_label_bytes = (self.flow_label << 4).to_bytes(2, 'big')
-
+        second_byte = (((self.ds % 4) << 6) + (self.ecn << 4) + (self.flow_label >> 16)).to_bytes(1, 'big')
+        flow_label_bytes = (self.flow_label % 65536).to_bytes(2, 'big')
         # Total length of packet, header included
-        #try:
-
-        self.length = len(self.payload.to_payload())
-        #except AttributeError:
-        #    print("here")
-        #    self.length = len(self.payload)
+        try:
+            self.length = len(self.payload.to_payload())
+        except AttributeError:
+            self.length = len(self.payload)
 
         length_bytes = self.length.to_bytes(2, 'big')
         next_bytes = self.next.to_bytes(1, 'big')
@@ -710,6 +725,44 @@ class IPv6:
         return first_byte + second_byte + flow_label_bytes + length_bytes + next_bytes + limit_bytes + src_bytes + \
                dst_bytes + payload
 
+    @classmethod
+    def ipv6_parser(cls, data):
+        """
+        Class Method that parses group of bytes to create IPv6 Object
+        :param data: ipv6 packet passed in as bytes
+        If protocol is "TCP", payload will be TCP object created
+        If protocol is "UDP", payload will be UDP object created
+        :return: IPv6 instance that contains the values that was in data
+        """
+
+        version = int.from_bytes(data[0:1], 'big') >> 4
+        traffic_class = int.from_bytes(data[0:2], 'big')
+        ds = (traffic_class % 4096) >> 6
+        ecn = (traffic_class % 64) >> 4
+        flow_label = int.from_bytes(data[1:4], 'big') % 1048576
+        length = int.from_bytes(data[4:6], 'big')
+        next = int.from_bytes(data[6:7], 'big')
+        limit = int.from_bytes(data[7:8], 'big')
+        src = int.from_bytes(data[8:24], 'big')
+        dst = int.from_bytes(data[24:40], 'big')
+
+        protocol = IPv4.int_to_protocol.get(next)
+
+        # If protocol not currently defined in class
+        if protocol is None:
+            protocol = next
+
+        if protocol == "udp":
+            payload = UDP.udp_parser(data[40:])
+        elif protocol == "tcp":
+            payload = TCP.tcp_parser(data[40:])
+        else:
+            payload = data[40:].decode("ascii")
+        returnable = IPv6(src, dst, payload, next=protocol, limit=limit, flow_label=flow_label, ds=ds, ecn=ecn,
+                          version=version)
+        returnable.length = length
+
+        return returnable
 
 class UDP:
     """
@@ -723,7 +776,7 @@ class UDP:
     :raise ValueError if dst is not valid dst port number
     """
 
-    def __init__(self, src_prt, dst_prt, src_ip, dst_ip, payload):
+    def __init__(self, src_prt, dst_prt, src_ip, dst_ip, payload, version=4):
 
         if src_prt > 65535 or src_prt < 0:
             raise ValueError("src_prt must be valid UDP port")
@@ -741,6 +794,7 @@ class UDP:
 
         # Set to zero
         self.checksum = 0
+        self.version = version
 
     def to_payload(self):
         """
@@ -753,7 +807,7 @@ class UDP:
         dst_prt = self.dst_prt.to_bytes(2, 'big')
         length = self.length.to_bytes(2, 'big')
         payload = self.payload.encode()
-        pseudo = form_ipv4_pseudo_header(self.src_ip, self.dst_ip, self.length, "udp")
+        pseudo = form_pseudo_header(self.src_ip, self.dst_ip, self.length, "udp", version=self.version)
 
         if self.checksum == 0:
             self.checksum = checksum(pseudo + src_prt + dst_prt + length + payload)
@@ -761,7 +815,6 @@ class UDP:
         checksum_bytes = self.checksum.to_bytes(2, 'big')
 
         return src_prt + dst_prt + length + checksum_bytes + payload
-
 
     @classmethod
     def udp_parser(cls, data):
@@ -816,7 +869,8 @@ class TCP:
     """
 
     def __init__(self, src_prt, dst_prt, src_ip, dst_ip, window, payload, sqn=0, ack_num=0, offset=5, ns=False,
-                 cwr=False, ece=False, urg=False, ack=False, psh=False, rst=False, syn=False, fin=False, urg_pnt=0):
+                 cwr=False, ece=False, urg=False, ack=False, psh=False, rst=False, syn=False, fin=False, urg_pnt=0,
+                 version=4):
         """init for TCP"""
         if src_prt > 65535 or src_prt < 0:
             raise ValueError("src_prt must be valid TCP port")
@@ -853,6 +907,8 @@ class TCP:
         self.src_ip = src_ip
         self.dst_ip = dst_ip
         self.checksum = 0
+
+        self.version = version
 
     def to_payload(self):
         """
@@ -895,7 +951,7 @@ class TCP:
 
         # Create pseudo header
         # Assume length of tcp header is 20 bytes
-        pseudo = form_ipv4_pseudo_header(self.src_ip, self.dst_ip, len(self.payload) + 20, "tcp")
+        pseudo = form_pseudo_header(self.src_ip, self.dst_ip, len(self.payload) + 20, "tcp", version=self.version)
         payload = self.payload.encode()
         # Check if checksum has been manually set
         if self.checksum == 0:
