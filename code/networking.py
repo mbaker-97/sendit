@@ -16,7 +16,7 @@ import csv
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -372,19 +372,18 @@ class EtherFrame:
         if etype is None:
             etype = bytes.fromhex(str(self.etype))
 
-        try:
-            payload = self.payload.to_payload()
-            payload_len = len(self.payload.to_payload())
-        except AttributeError:
-            payload = str.encode(self.payload)
-            payload_len = len(payload)
+        #try:
+        payload = self.payload.to_payload()
+        #except AttributeError:
+        #    payload = self.payload
+
+        payload_len = len(payload)
 
         # Determine Padding
         padding = None
         if payload_len < 46:
             zero = 0
             padding = zero.to_bytes(46 - payload_len, 'big')
-
         if padding is None:
             return dst + src + etype + payload
         else:
@@ -509,14 +508,14 @@ class IPv4:
     :param protocol: protocol carried in packet.
                      currently supported values: "tcp", "udp", "icmp", custom int value accepted IF valid
     :param dscp: differentiated services value - default of 0
-    :param ecn: explicit congestion notification - deafult of 0
+    :param ecn: explicit congestion notification - default of 0
     :param version: version of IP
     """
     protocols_to_int = {"icmp": 1, "tcp": 6, "udp": 17}
     int_to_protocol = {1: "icmp", 6: "tcp", 17: "udp"}
 
-    def __init__(self, src, dst, payload, id=0, df=False, mf=False, offset=0, ttl=64, protocol="tcp", dscp=0, ecn=0,
-                 version=4):
+    def __init__(self, src, dst, payload, id=0, length=0, df=False, mf=False, offset=0, ttl=64, protocol="tcp", dscp=0,
+                 ecn=0, version=4, checksum=0):
         """init for IPv4"""
         if ttl > 255 or ttl < 0:
             raise ValueError("ttl should be value between 0 and 255 inclusive")
@@ -526,28 +525,20 @@ class IPv4:
         self.ihl = 5
         self.dscp = dscp
         self.ecn = ecn
-        # Total length of packet, header included
-        try:
-            self.length = len(payload.to_payload()) + self.ihl * 4
-        except AttributeError:
-            self.length = len(payload) + self.ihl * 4
+        self.length = length
 
         self.id = id
         self.df = df
         self.mf = mf
         self.ttl = ttl
         self.offset = offset
-
-        self.protocol = IPv4.protocols_to_int.get(str(protocol).lower())
-        # Until time for error handling, trust users custom input
-        if self.protocol is None:
-            self.protocol = protocol
+        self.protocol = protocol
 
         self.src = src
         self.dst = dst
         self.payload = payload
 
-        self.checksum = 0
+        self.checksum = checksum
 
     def to_payload(self):
         """
@@ -559,7 +550,6 @@ class IPv4:
         """
         first_byte = int(bin(self.version)[2:].zfill(4) + bin(self.ihl)[2:].zfill(4), 2).to_bytes(1, 'big')
         second_byte = int(bin(self.dscp)[2:].zfill(6) + bin(self.ecn)[2:].zfill(2), 2).to_bytes(1, 'big')
-        length = self.length.to_bytes(2, 'big')
         identification = self.id.to_bytes(2, 'big')
 
         # Set flags
@@ -569,23 +559,49 @@ class IPv4:
         if self.mf:
             flags += 1
 
+        # Convert payload
+        # try to call to_payload function for layer 4 - if protocol not supported, payload treated as ascii string.
+        # If payload not string, it is assumed payload is already in bytes
+        try:
+            payload = self.payload.to_payload()
+        except AttributeError:
+            try:
+                payload = self.payload.encode()
+            except AttributeError:
+                payload = self.payload
+
+        # Total length of packet, header included
+        # Check if length explicitly set, if not, will be calculated
+        if self.length == 0:
+            try:
+                self.length = len(payload.to_payload()) + self.ihl * 4
+            except AttributeError:
+                self.length = len(payload) + self.ihl * 4
+
+        length = self.length
+
+        length_bytes = length.to_bytes(2, 'big')
+
         frag_bytes = int(bin(flags)[2:].zfill(3) + bin(self.offset)[2:].zfill(13), 2).to_bytes(2, 'big')
 
         time_to_live = self.ttl.to_bytes(1, 'big')
-        protocol = self.protocol.to_bytes(1, 'big')
+
+        protocol = IPv4.protocols_to_int.get(str(self.protocol).lower())
+        # Until time for error handling, trust users custom input
+        if protocol is None:
+            protocol = self.protocol
+        protocol_byte = protocol.to_bytes(1, 'big')
 
         # Convert IPv4 addresses
         src = inet_aton(self.src)
         dst = inet_aton(self.dst)
-        try:
-            payload = self.payload.to_payload()
-        except AttributeError:
-            payload = str.encode(self.payload)
-        # Calculate Checksum
-        self.checksum = checksum(first_byte + second_byte + length + identification + frag_bytes + time_to_live +
-                                 protocol + src + dst)
+
+        # Calculate Checksum if not manually set
+        if self.checksum == 0:
+            self.checksum = checksum(first_byte + second_byte + length_bytes + identification + frag_bytes + time_to_live +
+                                 protocol_byte + src + dst)
         check = self.checksum.to_bytes(2, 'big')
-        return first_byte + second_byte + length + identification + frag_bytes + time_to_live + protocol + check + src \
+        return first_byte + second_byte + length_bytes + identification + frag_bytes + time_to_live + protocol_byte + check + src \
                + dst + payload
 
     @classmethod
@@ -633,15 +649,22 @@ class IPv4:
         elif protocol == "tcp":
             payload = TCP.tcp_parser(data[20:])
         else:
-            payload = data[20:].decode("ascii")
+            try:
+                payload = data[20:].decode("ascii")
+            except UnicodeDecodeError:
+                payload = data[20:]
 
         returnable = IPv4(src, dst, payload, id=id, df=df_bool, mf=mf_bool, offset=offset, ttl=ttl, protocol=protocol,
-                          dscp=dscp, ecn=ecn, version=4)
-        returnable.length = length
-        returnable.version = version
+                          length=length, dscp=dscp, ecn=ecn, version=version, checksum=checksum)
         returnable.ihl = ihl
-        returnable.checksum = checksum
         return returnable
+
+    def reset_calculated_fields(self):
+        """
+        Resets calculated fields for IPv4 - resets length and checksum
+        """
+        self.checksum = 0
+        self.length = 0
 
 
 class IPv6:
@@ -657,7 +680,7 @@ class IPv6:
     :param version: IP version: default of 6
     """
 
-    def __init__(self, src, dst, payload, next="tcp", limit=64, flow_label=0, ds=0, ecn=0, version=6):
+    def __init__(self, src, dst, payload, next="tcp", limit=64, flow_label=0, ds=0, ecn=0, version=6, length=0):
         """init for IPv6"""
         # Check validity of addresses
         try:
@@ -676,15 +699,8 @@ class IPv6:
         # Check validity of ecn
         if ecn < 0 or ecn > 3:
             raise ValueError("ecn should be value between 0 and 3 inclusive")
-        try:
-            self.length = len(payload.to_payload())
-        except AttributeError:
-            self.length = len(payload)
 
-        self.next = IPv4.protocols_to_int.get(str(next).lower())
-        # Until time for error handling, trust users custom input - must be integer
-        if self.next is None:
-            self.next = next
+        self.next = next
 
         self.src = src
         self.dst = dst
@@ -693,7 +709,7 @@ class IPv6:
         self.ds = ds
         self.ecn = ecn
         self.flow_label = flow_label
-        self.length = 0
+        self.length = length
         self.payload = payload
 
     def to_payload(self):
@@ -707,23 +723,37 @@ class IPv6:
         first_byte = ((self.version << 4) + (self.ds >> 2)).to_bytes(1, 'big')
         second_byte = (((self.ds % 4) << 6) + (self.ecn << 4) + (self.flow_label >> 16)).to_bytes(1, 'big')
         flow_label_bytes = (self.flow_label % 65536).to_bytes(2, 'big')
-        # Total length of packet, header included
-        try:
-            self.length = len(self.payload.to_payload())
-        except AttributeError:
-            self.length = len(self.payload)
 
-        length_bytes = self.length.to_bytes(2, 'big')
-        next_bytes = self.next.to_bytes(1, 'big')
-        limit_bytes = self.limit.to_bytes(1, 'big')
-        src_bytes = IPv6Address(self.src).packed
-        dst_bytes = IPv6Address(self.dst).packed
+        # Convert payload
+        # try to call to_payload function for layer 4 - if protocol not supported, payload treated as ascii string.
+        # If payload not string, it is assumed payload is already in bytes
         try:
             payload = self.payload.to_payload()
         except AttributeError:
-            payload = str.encode(self.payload)
+            try:
+                payload = self.payload.encode()
+            except AttributeError:
+                payload = self.payload
+
+        # Set total length of packet if not manually set
+        if self.length == 0:
+            self.length = len(payload)
+
+        length_bytes = self.length.to_bytes(2, 'big')
+        next = IPv4.protocols_to_int.get(self.next.lower())
+        next_bytes = next.to_bytes(1, 'big')
+        limit_bytes = self.limit.to_bytes(1, 'big')
+        src_bytes = IPv6Address(self.src).packed
+        dst_bytes = IPv6Address(self.dst).packed
+
         return first_byte + second_byte + flow_label_bytes + length_bytes + next_bytes + limit_bytes + src_bytes + \
                dst_bytes + payload
+
+    def reset_calculated_fields(self):
+        """
+        Resets all calulated fields for IPv6 - resets length
+        """
+        self.length = 0
 
     @classmethod
     def ipv6_parser(cls, data):
@@ -734,7 +764,6 @@ class IPv6:
         If protocol is "UDP", payload will be UDP object created
         :return: IPv6 instance that contains the values that was in data
         """
-
         version = int.from_bytes(data[0:1], 'big') >> 4
         traffic_class = int.from_bytes(data[0:2], 'big')
         ds = (traffic_class % 4096) >> 6
@@ -757,16 +786,19 @@ class IPv6:
         elif protocol == "tcp":
             payload = TCP.tcp_parser(data[40:])
         else:
-            payload = data[40:].decode("ascii")
+            try:
+                payload = data[40:].decode("ascii")
+            except UnicodeDecodeError:
+                payload = data[40:]
+
         returnable = IPv6(src, dst, payload, next=protocol, limit=limit, flow_label=flow_label, ds=ds, ecn=ecn,
-                          version=version)
-        returnable.length = length
+                          version=version, length=length)
 
         return returnable
 
 class UDP:
     """
-    Creates IPv4 object from parameters
+    Creates UDP object from parameters
     UDP checksum is optional and therefore not currently supported
     TODO: provide checksum with psuedo header
     :param src: source port
@@ -776,7 +808,7 @@ class UDP:
     :raise ValueError if dst is not valid dst port number
     """
 
-    def __init__(self, src_prt, dst_prt, src_ip, dst_ip, payload, version=4):
+    def __init__(self, src_prt, dst_prt, src_ip, dst_ip, payload, version=4, length=0):
 
         if src_prt > 65535 or src_prt < 0:
             raise ValueError("src_prt must be valid UDP port")
@@ -788,13 +820,10 @@ class UDP:
         self.src_ip = src_ip
         self.dst_ip = dst_ip
         self.payload = payload
-        # Length of payload + header
-        # Header is 8 bytes long
-        self.length = (len(self.payload) + 8)
-
+        self.length = length
+        self.version = version
         # Set to zero
         self.checksum = 0
-        self.version = version
 
     def to_payload(self):
         """
@@ -805,8 +834,24 @@ class UDP:
         """
         src_prt = self.src_prt.to_bytes(2, 'big')
         dst_prt = self.dst_prt.to_bytes(2, 'big')
+
+        # Calculate length if not manually set
+        # Convert payload
+        # try to call to_payload function for application layer - if protocol not supported, payload treated as ascii string.
+        # If payload not string, it is assumed payload is already in bytes
+        try:
+            payload = self.payload.to_payload()
+        except AttributeError:
+            try:
+                payload = self.payload.encode()
+            except AttributeError:
+                payload = self.payload
+
+        if self.length == 0:
+            self.length = len(payload) + 8
+
         length = self.length.to_bytes(2, 'big')
-        payload = self.payload.encode()
+
         pseudo = form_pseudo_header(self.src_ip, self.dst_ip, self.length, "udp", version=self.version)
 
         if self.checksum == 0:
@@ -828,12 +873,22 @@ class UDP:
         dst = int.from_bytes(data[2:4], 'big')
         length = int.from_bytes(data[4:6], 'big')
         checksum = int.from_bytes(data[6:8], 'big')
-        payload = data[8:].decode("ascii")
-
+        try:
+            payload = data[8:].decode("ascii")
+        except UnicodeDecodeError:
+            payload = data[8:]
         returnable = UDP(src, dst, "0.0.0.0", "0.0.0.0", payload)
         returnable.length = length
         returnable.checksum = checksum
         return returnable
+
+    def reset_calculated_fields(self):
+        """
+        Resets calcualted fields for UDP - resets checksum and length
+        :return:
+        """
+        self.checksum = 0
+        self.length = 0
 
 
 class TCP:
@@ -847,7 +902,7 @@ class TCP:
     :param dst_ip: destination IP, used to calculate checksum
     :param sqn:  sequence Number
     :param ack_num: Acknowledgement Number
-    :param offset: byte offset of where data starts
+    :param offset: byte offset of where data starts - default of 5
     :param ns: ns flag - default of False
     :param cwr: cwr flag - default of False
     :param ece: ece flag - default of False
@@ -858,6 +913,10 @@ class TCP:
     :param syn: syn flag - default of False
     :param fin: fin flag - default of False
     :param urg_pnt: offset of where urgent data stops
+    :param mss - maximum segment size
+    :param scaling - window scaling factor
+    :param sack - tuple containing bytes, in order, to be passes as selective acknowledgments
+    :param stamps - tuple containing timestamp value and time stamp error
 
     :raise ValueError when src_prt not between 0 and 65535 inclusive
     :raise ValueError when dst_port not between 0 and 65535 inclusive
@@ -865,13 +924,15 @@ class TCP:
     :raise ValueError when ack_number not between 0 and 4294967295 inclusive
     :raise ValueError when window not between 0 and 4294967295 inclusive
     :raise ValueError when urg_pnt not between 0 and 4294967295 inclusive
+    :raise ValueError when length of sack greater than 8
+    :raise ValueError when sack contains odd number of values
 
     """
 
-    def __init__(self, src_prt, dst_prt, src_ip, dst_ip, window, payload, sqn=0, ack_num=0, offset=5, ns=False,
+    def __init__(self, src_prt, dst_prt, src_ip, dst_ip, window, payload, sqn=0, ack_num=0, ns=False,
                  cwr=False, ece=False, urg=False, ack=False, psh=False, rst=False, syn=False, fin=False, urg_pnt=0,
-                 version=4):
-        """init for TCP"""
+                 version=4, mss=None, scaling=None, sack_permitted=None, stamp=None, sack=None, offset=5, checksum=0):
+
         if src_prt > 65535 or src_prt < 0:
             raise ValueError("src_prt must be valid TCP port")
         if dst_prt > 65535 or dst_prt < 0:
@@ -884,12 +945,18 @@ class TCP:
             raise ValueError("window must be valid window size")
         if urg_pnt > 4294967295 or urg_pnt < 0:
             raise ValueError("urg_pnt must be valid urgent pointer number")
+        if sack is not None:
+            if len(sack) > 8:
+                raise ValueError("sack must contain 8 or fewer values")
+            if sack % 2 != 0:
+                raise ValueError("sack must contain and even number of values - each pair the start and end values of "
+                                 "a block")
+
         self.src_prt = src_prt
         self.dst_prt = dst_prt
         self.window = window
-        self.seq = sqn
+        self.sqn = sqn
         self.ack_num = ack_num
-        self.offset = offset
         self.ns = ns
         self.cwr = cwr
         self.ece = ece
@@ -906,9 +973,153 @@ class TCP:
         # For pseudo header to calculate checksum
         self.src_ip = src_ip
         self.dst_ip = dst_ip
-        self.checksum = 0
+        self.checksum = checksum
 
         self.version = version
+        self.offset = offset
+
+        self.mss = mss
+        self.scaling = scaling
+        self.sack_permitted = sack_permitted
+        self.stamp = stamp
+        self.sack = sack
+
+    def create_tcp_options(self):
+        """
+        Set TCP Header options
+        mss, sack_permitted, and scaling only used during syn and ack of handshake
+        sack (selective acknowledgment) value cannot be set during handhake
+        Header option combinations are:
+        mss, sack_permitted, scaling, and stamp (timestamp) during handshake - any combination of these 4
+        timestamp and selective acknowledgement value during regular transmissions - any combination of these 2
+        Depending on what combination of these are set depends on what order they are arranged in, along with
+        nop (No-op) bytes to fit in 32 bit word
+
+        TODO Timestamp logic needs to include echo reply timestamp
+        TODO handle sack value
+        :return: bytes of options for this TCP segment
+        """
+
+        nop = 1  # nop value
+        options = bytearray()
+
+        # Exactly one 32-bit word, if set will always be firt
+        if self.mss is not None:
+            self.offset += 1
+            type = 2
+            length = 4
+            options += type.to_bytes(1, 'big')
+            options += length.to_bytes(1, 'big')
+            options += self.mss.to_bytes(2, 'big')
+
+        # Format of options if sack_permitted and timestamp used
+        if self.sack_permitted and self.stamp is not None:
+            self.offset += 3
+            # Add sack permitted first
+            type = 4
+            length = 2
+            options += type.to_bytes(1, 'big')
+            options += length.to_bytes(1, 'big')
+
+            # Add timestamp
+            type = 8
+            length = 10
+            options += type.to_bytes(1, 'big')
+            options += length.to_bytes(1, 'big')
+            options += self.stamp[0].to_bytes(4, 'big')
+            options += self.stamp[1].to_bytes(4, 'big')
+            options += nop.to_bytes(1, 'big')
+
+            # Format of options if scaling also used
+            if self.scaling is not None:
+                self.offset += 1
+                # Add nop
+                options += nop.to_bytes(1, 'big')
+                # Add scaling
+                type = 3
+                length = 3
+                options += type.to_bytes(1, 'big')
+                options += length.to_bytes(1, 'big')
+                options += self.scaling.to_bytes(1, 'big')
+
+        # Options format if sack_permitted and window scaling used but not timestamp
+        if self.sack_permitted and self.scaling is not None and self.stamp is None:
+            self.offset += 2
+
+            # Add sack permitted first
+            type = 4
+            length = 2
+            options += type.to_bytes(1, 'big')
+            options += length.to_bytes(1, 'big')
+            # Add two nops
+            options += nop.to_bytes(1, 'big')
+            options += nop.to_bytes(1, 'big')
+
+            # Add window scaling
+            type = 3
+            length = 3
+            options += type.to_bytes(1, 'big')
+            options += length.to_bytes(1, 'big')
+            options += self.scaling.to_bytes(1, 'big')
+
+            # Add nop
+            options += nop.to_bytes(1, 'big')
+
+        # Options format if timestamp used but not sack_permitted and not sack (value)
+        if self.stamp is not None and all(option is None for option in [self.sack_permitted, self.sack]):
+            self.offset += 3
+            # Add timestamp
+            type = 8
+            length = 10
+            options += type.to_bytes(1, 'big')
+            options += length.to_bytes(1, 'big')
+            options += self.stamp[0].to_bytes(4, 'big')
+            options += self.stamp[1].to_bytes(4, 'big')
+            options += nop.to_bytes(1, 'big')
+
+            # Add 2 nops
+            options += nop.to_bytes(1, 'big')
+            options += nop.to_bytes(1, 'big')
+
+            # Add window scaling if set
+            if self.scaling is not None:
+                type = 3
+                length = 3
+                options += type.to_bytes(1, 'big')
+                options += length.to_bytes(1, 'big')
+                options += self.scaling.to_bytes(1, 'big')
+
+                # Add nop
+                options += nop.to_bytes(1, 'big')
+
+        # sack_permitted used by not window scaling or timestamp
+        if self.sack_permitted and all(option is None for option in [self.scaling, self.stamp]):
+            self.offset += 1
+            type = 4
+            length = 2
+            options += type.to_bytes(1, 'big')
+            options += length.to_bytes(1, 'big')
+
+            # Add 2 nops
+            options += nop.to_bytes(1, 'big')
+            options += nop.to_bytes(1, 'big')
+
+        # Scaling used but not timestamp or sack_permitted
+        if self.scaling is not None and all(option is None for option in [self.scaling, self.stamp]):
+            type = 3
+            length = 3
+            options += type.to_bytes(1, 'big')
+            options += length.to_bytes(1, 'big')
+            options += self.scaling.to_bytes(1, 'big')
+
+            # Add nop
+            options += nop.to_bytes(1, 'big')
+
+        # Selective Acknowledgment only is used
+        if self.sack is not None and self.stamp is None:
+            pass
+
+        return options
 
     def to_payload(self):
         """
@@ -918,13 +1129,16 @@ class TCP:
         """
         src_prt = self.src_prt.to_bytes(2, 'big')
         dst_prt = self.dst_prt.to_bytes(2, 'big')
-        sqn = self.seq.to_bytes(4, 'big')
+        sqn = self.sqn.to_bytes(4, 'big')
         ack_num = self.ack_num.to_bytes(4, 'big')
 
+        # Creates bytes object of options, modifies offset value
+        options = self.create_tcp_options()
+
+        # Create int that holds offset and ns flag
         offset = self.offset << 4
         if self.ns:
             offset += 1
-
         offset_byte = offset.to_bytes(1, 'big')
 
         flags = 0
@@ -949,20 +1163,31 @@ class TCP:
         window_bytes = self.window.to_bytes(2, 'big')
         urgent_pnt_bytes = self.urg_pnt.to_bytes(2, 'big')
 
+        # Convert payload
+        # try to call to_payload function for application layer - if protocol not supported, payload treated as ascii string.
+        # If payload not string, it is assumed payload is already in bytes
+        try:
+            payload = self.payload.to_payload()
+        except AttributeError:
+            try:
+                payload = self.payload.encode()
+            except AttributeError:
+                payload = self.payload
         # Create pseudo header
-        # Assume length of tcp header is 20 bytes
-        pseudo = form_pseudo_header(self.src_ip, self.dst_ip, len(self.payload) + 20, "tcp", version=self.version)
-        payload = self.payload.encode()
+        pseudo = form_pseudo_header(self.src_ip, self.dst_ip, len(payload) + (self.offset * 4), "tcp", version=self.version)
+
+
+
         # Check if checksum has been manually set
+
         if self.checksum == 0:
-            self.checksum = checksum(
-                pseudo + src_prt + dst_prt + sqn + ack_num + offset_byte + flags_bytes + window_bytes +
-                urgent_pnt_bytes + payload)
+            self.checksum = checksum(pseudo + src_prt + dst_prt + sqn + ack_num + offset_byte + flags_bytes +
+                                     window_bytes + urgent_pnt_bytes + options + payload)
 
         checksum_bytes = self.checksum.to_bytes(2, 'big')
-
         return src_prt + dst_prt + sqn + ack_num + offset_byte + flags_bytes + window_bytes + checksum_bytes + \
-               urgent_pnt_bytes + payload
+                urgent_pnt_bytes + options + payload
+
 
     @classmethod
     def tcp_parser(cls, data):
@@ -997,20 +1222,29 @@ class TCP:
         window = int.from_bytes(data[14:16], 'big')
         checksum = int.from_bytes(data[16:18], 'big')
         urg_pnt = int.from_bytes(data[18:20], 'big')
-        data = data[20:].decode("ascii")
+        try:
+            payload = data[20:].decode("ascii")
+        except UnicodeDecodeError:
+            payload = data[20:]
 
-        returnable = TCP(src, dst, "0.0.0.0", "0.0.0.0", window, data, sqn=sqn, ack_num=ack_num, offset=offset,
+        returnable = TCP(src, dst, "0.0.0.0", "0.0.0.0", window, payload, sqn=sqn, ack_num=ack_num,
                          ns=flag_bool[0], cwr=flag_bool[1], ece=flag_bool[2], urg=flag_bool[3], ack=flag_bool[4],
-                         psh=flag_bool[5], rst=flag_bool[6], syn=flag_bool[7], fin=flag_bool[8], urg_pnt=urg_pnt)
-        returnable.checksum = checksum
+                         psh=flag_bool[5], rst=flag_bool[6], syn=flag_bool[7], fin=flag_bool[8], urg_pnt=urg_pnt,
+                         checksum=checksum, offset=offset)
 
         return returnable
+
+    def reset_calculated_fields(self):
+        """
+        Resets calculated fields for TCP - resets checksum and length
+        """
+        self.checksum = 0
+        self.offset = 5
 
 
 if __name__ == '__main__':
     """ main method provided to show example usage"""
-    print("Example usage here: ")
-    # Example usage:
+    # Example usage here:
 
     # Example 1: Standard Usage
 
@@ -1024,27 +1258,42 @@ if __name__ == '__main__':
     # Or call provided method get_ip(interface)
 
     # Uncomment code from here
-    # payload = "The quick brown fox jumps over the lazy dog"  # String payload
-    # nic = Raw_NIC("wlan0")  # Create Raw_NIC - replace interface name with your interface
+    payload = "The quick brown fox jumps over the lazy dog"  # String payload
+    nic = Raw_NIC("lo")  # Create Raw_NIC - replace interface name with your interface
     # Creates TCP segment. IPs needed to calcualte checksum:
-    # l4_tcp = TCP(50000, 50001, "192.168.1.1", "192.168.1.2", 1024, payload)  # Change 1st ip to yours, 2nd to target.
+    l4_tcp = TCP(50000, 50001, "127.0.0.1", "127.0.0.1", 1024, payload)  # Change 1st ip to yours, 2nd to target.
     # Creates IPv4 packet:
-    # l3 = IPv4("192.168.1.1", "192.168.1.2", l4_tcp, protocol="tcp")  # Change 1st ip to yours, 2nd to target
+    l3 = IPv4("127.0.0.1", "127.0.0.1", l4_tcp, protocol="tcp")  # Change 1st ip to yours, 2nd to target
     # Creates Etherframe:
-    # l2 = EtherFrame("AA:BB:CC:DD:EE:FF", "00:11:22:33:44:55", l3)  # Change 1st mac to yours, 2nd to target
-    # nic.send(l2)  # Send payload - open up Wireshark to see your payload
+    l2 = EtherFrame("AA:BB:CC:DD:EE:FF", "00:11:22:33:44:55", l3)  # Change 1st mac to yours, 2nd to target
+    nic.send(l2)  # Send payload - open up Wireshark to see your payload
     # To Here
+
 
     # Example 2 - change payload to use UDP
 
     # Uncomment code from here
-    # l4_udp = UDP(50000, 50001, "192.168.1.1", "192.168.1.2", payload)  # Create UDP object
-    # l2.payload.payload = l4_udp  # Change l3 (and IPv4 packet) payload to new UDP object
-    # l2.payload.protocol = IPv4.protocols_to_int.get("udp")  # Change l3 protocol to now say payload contains UDP segment
-    # nic.send(l2)  # Send new frame with UDP segment
+    l4_udp = UDP(50000, 50001, "127.0.0.1", "127.0.0.1", payload)  # Create UDP object
+    l2.payload.payload = l4_udp # Assign UDP object as Etherframe's payload's payload - payload of IPv4 object
+    l2.payload.reset_calculated_fields() # Reset calculated fields for IPv4 object - length and checksum
+    l2.payload.protocol = "udp" # Set IPv4 object's protocol to udp
+    nic.send(l2)  # Send new frame with UDP segment
     # To Here
 
-    # Example 3 - change payload to send ARP request
+
+    # Example 3 - demonstrate to_payload and parser functions
+    # to_payload turns objects into bytes ready to be sent on wire
+    # Each class' parser function creates a new object from a byte string - usually raw bytes captured from nic
+    # Each parser function parses its layers bytes, and passes the remaining bytes to the parser function of the next
+    # layer, where the final layer finally returns, similiar to recursion
+    # Each to_payload function works the same way, where each object's to payload converts it's information to bytes,
+    # and then calls the next layer's (the current layer's payload) to_payload function
+    # Uncomment from here
+    # l22 = EtherFrame.etherframe_parser(l2.to_payload())
+    # nic.send(l22)  # Check that recreated parsed data looks the same
+    # To Here
+
+    # Example 4 - change payload to send ARP request
 
     # Uncomment code from here
     # Creates ARP request to find IP Change 1st MAC to your MAC, 1st IP to yours, 2nd IP to IP you are asking about
@@ -1053,3 +1302,27 @@ if __name__ == '__main__':
     # l2.type = "arp" # Sets Ethertype to ARP
     # nic.send(l2) # Send new frame with ARP Request - open Wireshark to look for response!
     # To Here
+
+    # Example 5 - change payload to use tcp over IPv6
+    # Uncomment from here
+    # l4_tcp.reset_calculated_fields() # reset calculated fields of TCP (length, checksum)
+    # l4_tcp.version = 6 # Switch IP version TCP is set to. If creating new TCP object, can be set on creation
+    # l4_tcp.src_ip = "::1" # Set IPv6 Source address for UDP pseudoheader creation
+    # l4_tcp.dst_ip = "::1" # Set IPv6 Destination address for UDP pseudoheader creation
+    # l3_6 = IPv6("0000:0000:0000:0000:0000:0000:0000:0001", "::1", l4_tcp) #Create IPv6 object. Note capable of taking IPv6 addresses in different formats
+    # l2.payload = l3_6 #switch payload of EtherFrame to IPv6 object
+    # l2.etype = "ipv6" #switch ethertype of etherframe to IPv6 type
+    # nic.send(l2) # Send it!
+    # To here
+
+    #Example 6 - change payload to use udp over IPv6
+    # Uncomment from here
+    # l4_udp.reset_calculated_fields() # Reset calculated fields (length, checksum)
+    # l4_udp.version = 6 # Switch IP version UDP is set to. If creating new UDP object, can be set on creation
+    # l4_udp.src_ip = "::1" # Set IPv6 Source address for UDP pseudoheader creation
+    # l4_udp.dst_ip = "::1" # Set IPv6 Destination address for UDP pseudoheader creation
+    # l3_6.payload = l4_udp # Assign the UDP object as the IPv6 object's payload
+    # l3_6.next = "udp" # Switch the protocol held within IPv6 object
+    # l3_6.reset_calculated_fields() #Reset calculated fields (length)
+    # nic.send(l2) # Send it!
+    # To here
