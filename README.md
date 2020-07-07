@@ -4,6 +4,10 @@ Provides easy access to forming and sending custom Ethernet frame, ARP messages,
 ## Getting Started
 To confirm what you are sending, open up a network analysis tool like Wireshark.
 
+To Install use pip:
+```
+pip install sendit==1.0.2
+```
 ### Sending data over TCP
 
 The general structure is to first create a Raw_NIC - this is a wrapper class around a Python raw socket. 
