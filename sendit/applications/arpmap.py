@@ -1,8 +1,22 @@
 #!/usr/bin/python3
 # Running on Class A network stores about 1GB of addresses!
-import os
-from networking import *
+__author__ = "Matt Baker"
+__credits__ = ["Matt Baker"]
+__license__ = "GPL"
+__version__ = "1.0.2"
+__maintainer__ = "Matt Baker"
+__email__ = "mbakervtech@gmail.com"
+__status__ = "Development"
 
+import os
+import time
+from sendit.protocols.arp import ARP
+from sendit.protocols.etherframe import EtherFrame
+from sendit.helper_functions.helper import MAC_to_manufacturer,is_valid_ipv4, is_valid_MAC, ip_to_int, get_MAC, get_ip, BROADCAST_MAC
+from sendit.handlers.raw_nic import Raw_NIC
+from socket import inet_ntoa
+from threading import Thread
+import random
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
@@ -72,7 +86,6 @@ def ARP_map(network, prefix, interface, mac, ip, rand=False, delay=0.0):
         raise ValueError("MAC must be valid MAC address")
     if not is_valid_ipv4(ip):
         raise ValueError("ip must be valid ipv4 address")
-
     # Create two Raw_NICS, one to send and one to listen on
     nic_send = Raw_NIC(interface)
     nic_listen = Raw_NIC(interface)
@@ -139,7 +152,7 @@ if __name__ == "__main__":
 
     rand_bool = rand.lower() == 'y'
 
-    mac = get_mac(interface)
+    mac = get_MAC(interface)
     ip = get_ip(interface)
 
     ARP_map(network, prefix, interface, mac, ip, rand=rand_bool, delay=delay)
