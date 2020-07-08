@@ -116,22 +116,22 @@ class TCP:
         nop (No-op) bytes to fit in 32 bit word
 
         TODO handle sack value
-        :return: bytes of options for this TCP segment
+        :return: tuple consisting of bytes of options for this TCP segment and increase to options header
         """
 
         nop = 1  # nop value
         options = bytearray()
-
+        offset_increase = 0
         # Exactly one 32-bit word, if set will always be firt
         if self.mss is not None:
-            self.offset += 1
+            offset_increase += 1
             type = 2
             length = 4
             options += pack('!BBH', type, length, self.mss)
 
         # Format of options if sack_permitted and timestamp used
         if self.sack_permitted and self.stamp is not None:
-            self.offset += 3
+            offset_increase  += 3
             # Add sack permitted first
             type = 4
             length = 2
@@ -146,7 +146,7 @@ class TCP:
 
             # Format of options if scaling also used
             if self.scaling is not None:
-                self.offset += 1
+                offset_increase += 1
                 # Add scaling
                 type = 3
                 length = 3
@@ -154,7 +154,7 @@ class TCP:
 
         # Options format if sack_permitted and window scaling used but not timestamp
         if self.sack_permitted and self.scaling is not None and self.stamp is None:
-            self.offset += 2
+            offset_increase += 2
 
             # Add sack permitted first
             type = 4
@@ -168,7 +168,7 @@ class TCP:
 
         # Options format if timestamp used but not sack_permitted and not sack (value)
         if self.stamp is not None and all(option is None for option in [self.sack_permitted, self.sack]):
-            self.offset += 3
+            offset_increase += 3
             # Add timestamp
             type = 8
             length = 10
@@ -182,7 +182,7 @@ class TCP:
 
         # sack_permitted used by not window scaling or timestamp
         if self.sack_permitted and all(option is None for option in [self.scaling, self.stamp]):
-            self.offset += 1
+            offset_increase += 1
             type = 4
             length = 2
             options += pack('!BBBB', type, length, nop, nop)
@@ -197,7 +197,7 @@ class TCP:
         if self.sack is not None and self.stamp is None:
             pass
 
-        return options
+        return (options, offset_increase) 
 
     def as_bytes(self):
         """
@@ -208,6 +208,10 @@ class TCP:
 
         # Creates bytes object of options, modifies offset value
         options = self.create_tcp_options()
+        # Check if offset is manually set or set to default of 5
+        # If set to default of 5, add in increase due to header options
+        if self.offset == 5:
+            self.offset += options[1]
 
         # Create int that holds offset and ns flag
         offset = self.offset << 4
@@ -251,9 +255,52 @@ class TCP:
         if self.checksum == 0:
             self.checksum = checksum(pseudo + pack('!HHIIBBHH', self.src_prt, self.dst_prt, self.sqn,
                                                           self.ack_num, offset, flags, self.window, self.urg_pnt) +
-                                                          options + payload)
+                                                          options[0] + payload)
+        return pack('!HHIIBBHHH', self.src_prt, self.dst_prt, self.sqn, self.ack_num, offset, flags, self.window, self.checksum, self.urg_pnt) + options[0] + payload
 
-        return pack('!HHIIBBHHH', self.src_prt, self.dst_prt, self.sqn, self.ack_num, offset, flags, self.window, self.checksum, self.urg_pnt) + options + payload
+
+    def parse_options(option_bytes):
+        # list of options to return. Values are, in order,
+        # MSS, Window Scale, sack permitted, sack values, timestamp
+        options = [None, None, None, None, None]
+        i = 0
+        while i < len(option_bytes):
+            type_num = int.from_bytes(option_bytes[i:i+1], 'big' )
+            # if type is end of options list
+            if type_num == 0:
+                i += 1
+                continue
+            # if type is noop
+            elif type_num == 1:
+                i +=1
+                continue
+            # if type is Maximum Segment size
+            elif type_num == 2:
+                options[0] = int.from_bytes(option_bytes[i+2:i+4], 'big')
+                i +=4
+                continue
+            # if type is Window scale
+            elif type_num == 3:
+                options[1] = int.from_bytes(option_bytes[i+2:i+3], 'big')
+                i+=3
+                continue
+            # if type is sack permitted
+            elif type_num == 4:
+                options[2] = True
+                i+= 2
+                continue
+            # if type is sack. Currently is not supported
+            elif type_num == 5:
+                length = int.from_bytes(option_bytes[i+1], 'big')
+                i+=length
+                continue
+            # if type is timestamp:
+            elif type_num == 8:
+                tstamp = (int.from_bytes(option_bytes[i+2:i+6]), int.from_bytes(option_bytes[i+6:i+10]))
+                options[5] = tstamp
+                i+= 10
+        return options
+
 
 
     @classmethod
@@ -270,7 +317,6 @@ class TCP:
         ack_num = int.from_bytes(data[8:12], 'big')
         # Binary operations to get flags:
         offset = int.from_bytes(data[12:13], 'big') >> 4
-
         # Grab flags ... binary math
         flags = [0] * 9
         flags[0] = int.from_bytes(data[12:13], 'big') % 2
@@ -289,18 +335,25 @@ class TCP:
         window = int.from_bytes(data[14:16], 'big')
         checksum = int.from_bytes(data[16:18], 'big')
         urg_pnt = int.from_bytes(data[18:20], 'big')
+        # Data starts after offset*4
+        # If offset is 5, there are no options
+        if offset != 5:
+            option_bytes = data[20:(offset*4)]
+            options = cls.parse_options(option_bytes)
+
         try:
-            payload = data[20:].decode("ascii")
+            payload = data[offset*4:].decode("ascii")
         except UnicodeDecodeError:
-            payload = data[20:]
+            payload = data[offset*4:]
 
         returnable = TCP(src, dst, "0.0.0.0", "0.0.0.0", window, payload, sqn=sqn, ack_num=ack_num,
                          ns=flag_bool[0], cwr=flag_bool[1], ece=flag_bool[2], urg=flag_bool[3], ack=flag_bool[4],
                          psh=flag_bool[5], rst=flag_bool[6], syn=flag_bool[7], fin=flag_bool[8], urg_pnt=urg_pnt,
-                         checksum=checksum, offset=offset)
+                         checksum=checksum, offset=offset, mss=options[0], scaling=options[1], sack_permitted=options[2],
+                         sack=options[3],stamp=options[4])
 
         return returnable
-
+    
     def reset_calculated_fields(self):
         """
         Resets calculated fields for TCP - resets checksum and length
