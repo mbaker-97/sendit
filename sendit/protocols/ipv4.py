@@ -120,7 +120,7 @@ class IPv4:
                            self.checksum) + src + dst + payload
 
     @classmethod
-    def ipv4_parser(cls, data):
+    def ipv4_parser(cls, data, recursive=True):
         """
         Class Method that parses group of bytes to create IPv4 Object
         :param data: ipv4 packet passed in as bytes
@@ -158,16 +158,18 @@ class IPv4:
             mf_bool = True
         else:
             mf_bool = False
-
-        if protocol == "udp":
-            payload = UDP.udp_parser(data[20:])
-        elif protocol == "tcp":
-            payload = TCP.tcp_parser(data[20:])
+        if recursive:
+            if protocol == "udp":
+                payload = UDP.udp_parser(data[20:])
+            elif protocol == "tcp":
+                payload = TCP.tcp_parser(data[20:])
+            else:
+                try:
+                     payload = data[20:].decode("ascii")
+                except UnicodeDecodeError:
+                    payload = data[20:]
         else:
-            try:
-                payload = data[20:].decode("ascii")
-            except UnicodeDecodeError:
-                payload = data[20:]
+            payload = data[20:]
 
         returnable = IPv4(src, dst, payload, id=id, df=df_bool, mf=mf_bool, offset=offset, ttl=ttl, protocol=protocol,
                           length=length, dscp=dscp, ecn=ecn, version=version, checksum=checksum)

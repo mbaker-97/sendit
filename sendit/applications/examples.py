@@ -31,7 +31,7 @@ if __name__ == '__main__':
     payload = "The quick brown fox jumps over the lazy dog"  # String payload
     nic = raw_nic.Raw_NIC("lo")  # Create Raw_NIC - replace interface name with your interface
     # Creates TCP segment. IPs needed to calculate checksum:
-    l4_tcp = TCP(50000, 50001, "127.0.0.1", "127.0.0.1", 1024, payload)  # Change 1st ip to yours, 2nd to target.
+    l4_tcp = TCP(50000, 50001, "127.0.0.1", "127.0.0.1", 1024, payload, mss=62500, scaling = 127, sack_permitted=True)  # Change 1st ip to yours, 2nd to target.
     # Creates IPv4 packet:
     l3 = IPv4("127.0.0.1", "127.0.0.1", l4_tcp, protocol="tcp")  # Change 1st ip to yours, 2nd to target
     # Creates Etherframe:

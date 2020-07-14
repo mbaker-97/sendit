@@ -291,20 +291,20 @@ class TCP:
                 continue
             # if type is sack. Currently is not supported
             elif type_num == 5:
-                length = int.from_bytes(option_bytes[i+1], 'big')
+                length = int.from_bytes(option_bytes[i+1:i+2], 'big')
                 i+=length
                 continue
             # if type is timestamp:
             elif type_num == 8:
-                tstamp = (int.from_bytes(option_bytes[i+2:i+6]), int.from_bytes(option_bytes[i+6:i+10]))
-                options[5] = tstamp
+                tstamp = (int.from_bytes(option_bytes[i+2:i+6], 'big'), int.from_bytes(option_bytes[i+6:i+1], 'big'))
+                options[4] = tstamp
                 i+= 10
         return options
 
 
 
     @classmethod
-    def tcp_parser(cls, data):
+    def tcp_parser(cls, data, recursive=True):
         """
         Class method that creates TCP object
         :param data: TCP segment passed in as bytes
@@ -340,10 +340,15 @@ class TCP:
         if offset != 5:
             option_bytes = data[20:(offset*4)]
             options = cls.parse_options(option_bytes)
+        else:
+            options = (None,None,None,None,None)
 
-        try:
-            payload = data[offset*4:].decode("ascii")
-        except UnicodeDecodeError:
+        if recursive:
+            try:
+                payload = data[offset*4:].decode("ascii")
+            except UnicodeDecodeError:
+                payload = data[offset*4:]
+        else:
             payload = data[offset*4:]
 
         returnable = TCP(src, dst, "0.0.0.0", "0.0.0.0", window, payload, sqn=sqn, ack_num=ack_num,

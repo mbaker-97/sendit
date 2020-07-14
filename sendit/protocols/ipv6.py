@@ -101,7 +101,7 @@ class IPv6:
         self.length = 0
 
     @classmethod
-    def ipv6_parser(cls, data):
+    def ipv6_parser(cls, data, recursive=True):
         """
         Class Method that parses group of bytes to create IPv6 Object
         :param data: ipv6 packet passed in as bytes
@@ -120,21 +120,25 @@ class IPv6:
         src = int.from_bytes(data[8:24], 'big')
         dst = int.from_bytes(data[24:40], 'big')
 
-        protocol = IPv4.int_to_protocol.get(next)
+        protocol = int_to_protocol.get(next)
 
         # If protocol not currently defined in class
         if protocol is None:
             protocol = next
 
-        if protocol == "udp":
-            payload = UDP.udp_parser(data[40:])
-        elif protocol == "tcp":
-            payload = TCP.tcp_parser(data[40:])
+        if recursive:
+
+            if protocol == "udp":
+                payload = UDP.udp_parser(data[40:])
+            elif protocol == "tcp":
+                payload = TCP.tcp_parser(data[40:])
+            else:
+                try:
+                    payload = data[40:].decode("ascii")
+                except UnicodeDecodeError:
+                    payload = data[40:]
         else:
-            try:
-                payload = data[40:].decode("ascii")
-            except UnicodeDecodeError:
-                payload = data[40:]
+            payload = data[40:]
 
         returnable = IPv6(src, dst, payload, next=protocol, limit=limit, flow_label=flow_label, ds=ds, ecn=ecn,
                           version=version, length=length)

@@ -75,7 +75,7 @@ class UDP:
         return pack('!HHHH', self.src_prt, self.dst_prt, self.length, self.checksum) + payload
 
     @classmethod
-    def udp_parser(cls, data):
+    def udp_parser(cls, data, recursive=True):
         """
         Class method that creates UDP object
         :param data: UDP segment passed in as bytes
@@ -86,9 +86,12 @@ class UDP:
         dst = int.from_bytes(data[2:4], 'big')
         length = int.from_bytes(data[4:6], 'big')
         checksum = int.from_bytes(data[6:8], 'big')
-        try:
-            payload = data[8:].decode("ascii")
-        except UnicodeDecodeError:
+        if recursive:
+            try:
+                payload = data[8:].decode("ascii")
+            except UnicodeDecodeError:
+                payload = data[8:]
+        else:
             payload = data[8:]
         returnable = UDP(src, dst, "0.0.0.0", "0.0.0.0", payload, length=length, checksum=checksum)
         return returnable

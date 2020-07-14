@@ -14,7 +14,7 @@ from sendit.protocols.ipv6 import IPv6
 class EtherFrame:
     """
     Holds all data of Etherframe
-    In normal usage, should be outermost encapsulation of data, can be used with Raw_NIC.send(frame)
+
 
     :param dst: string of destination MAC address
            ex: "AB:CD:EF:01:23:45"
@@ -43,7 +43,6 @@ class EtherFrame:
             raise ValueError("dst must me valid MAC address")
         if not is_valid_MAC(src):
             raise ValueError("src must me valid MAC address")
-        # TODO
 
         if str(ethertype).lower() not in EtherFrame.ethertype_to_bytes.keys() and (
                 len(str(ethertype)) != 4 or not is_hex(str(ethertype))):
@@ -59,7 +58,7 @@ class EtherFrame:
         Converts EtherFrame to proper format of payload bytes to send on Raw_NIC
         If self.payload is IPv4 or ARP object, their as_bytes function is called, providing the conversion of payload
         to properly formated bytes to be inserted into frame to be sent on Raw_NIC
-        If self.payload is not IPv4 or ARP object, self.payload is converted to bytes with str.encode(self.payload)
+        If self.payload is not IPv4 or ARP object, self.payload is conver
         :return: - bytes representation of EtherFrame
         """
         dst = addr_to_bytes(self.dst)
@@ -87,7 +86,7 @@ class EtherFrame:
             return dst + src + etype + payload + padding
 
     @classmethod
-    def etherframe_parser(cls, data):
+    def etherframe_parser(cls, data, recursive=True):
         """
         Class Method that parses group of bytes to create EtherFrame Object
         :param data: etherframe passed in as bytes
@@ -106,16 +105,21 @@ class EtherFrame:
             type = int(hex(int.from_bytes(type_bytes, 'big'))[2:])
         rest = data[14:]
 
-        # If ARP, parse ARP
-        if type == "arp":
-            payload = ARP.arp_parser(rest)
-        # If IPv4, parse IPv4
-        elif type == "ipv4":
-            payload = IPv4.ipv4_parser(rest)
-        elif type == "ipv6":
-            payload = IPv6.ipv6_parser(rest)
+        if recursive:
+             # If ARP, parse ARP
+            if type == "arp":
+                 payload = ARP.arp_parser(rest)
+            # If IPv4, parse IPv4
+            elif type == "ipv4":
+                payload = IPv4.ipv4_parser(rest)
+            elif type == "ipv6":
+                 payload = IPv6.ipv6_parser(rest)
+            else:
+                payload = data[14:]
         else:
             payload = data[14:]
+
+                
 
         returnable = EtherFrame(dst, src, payload, ethertype=type)
         return returnable
