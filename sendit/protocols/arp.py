@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.2"
+__version__ = "1.0.4"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -70,4 +70,38 @@ class ARP:
         tpa = inet_ntoa(data[24:28])
 
         return ARP(sha, spa, tha, tpa, hrd=hrd, pro=pro, hln=hln, pln=pln, op=op)
+
+    def __str__(self):
+        """
+        Gives string representation of ARP object
+        """
+        header = "*" * 20 + "__ARP__" + "*" * 20
+        sha = "Source Hardware Address: " + self.sha
+        tha = "Target Hardware Address: " + self.tha
+        spa = "Source Protocol Address: " + self.spa
+        tpa = "Target Protocol Address: " + self.tpa
+        hln = "Hardware Length: " + str(self.hln) + " bytes"
+        pln = "Protocol Length: " + str(self.pln) + " bytes"
+        op = "Operation: " + str(self.op)
+        if self.op == 1:
+            op = " ".join((op, "(request)"))
+        elif self.op == 2:
+            op = " ".join((op, "(reply)"))
+        pro = "Protocol Address type: " + str(self.pro)
+        if self.pro == 2048:
+            pro = " ".join((pro, "(IPv4)"))
+        hrd = "Hardware Address type: " + str(self.hrd)
+        if self.hrd == 1:
+            hrd = " ".join((hrd, "(Ethernet)"))
+        trailer = "*" * 47
+        return "\n".join((header, sha, tha, spa, tpa, hln, pln, op, pro, hrd, trailer))
+
+        
+
+
+
+
+
+
+
 

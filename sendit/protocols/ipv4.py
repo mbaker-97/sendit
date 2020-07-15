@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.2"
+__version__ = "1.0.4"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -10,7 +10,7 @@ from struct import pack, unpack
 from socket import inet_aton, inet_ntoa
 from sendit.protocols.tcp import TCP
 from sendit.protocols.udp import UDP
-from sendit.helper_functions.helper import checksum 
+from sendit.helper_functions.helper import *
 class IPv4:
     """
     Creates IPv4 object from parameters
@@ -34,8 +34,6 @@ class IPv4:
                      called. Set when IPv4 object created from parser function, and unless reset manually or with
                      reset_calculated_fields function, will NOT be recalculated when as_bytes is called
     """
-    protocols_to_int = {"icmp": 1, "tcp": 6, "udp": 17}
-    int_to_protocol = {1: "icmp", 6: "tcp", 17: "udp"}
 
     def __init__(self, src, dst, payload, id=0, length=0, df=False, mf=False, offset=0, ttl=64, protocol="tcp", dscp=0,
                  ecn=0, version=4, checksum=0):
@@ -102,7 +100,7 @@ class IPv4:
                 self.length = len(payload) + self.ihl * 4
 
         frag_bytes = int(bin(flags)[2:].zfill(3) + bin(self.offset)[2:].zfill(13), 2)
-        protocol = IPv4.protocols_to_int.get(str(self.protocol).lower())
+        protocol = protocols_to_int.get(str(self.protocol).lower())
 
         # Until time for error handling, trust users custom input
         if protocol is None:
@@ -140,7 +138,7 @@ class IPv4:
         ttl = int.from_bytes(data[8:9], 'big')
 
         protocol_num = int.from_bytes(data[9:10], 'big')
-        protocol = IPv4.int_to_protocol.get(protocol_num)
+        protocol = int_to_protocol.get(protocol_num)
 
         # If protocol not currently defined in class
         if protocol is None:
@@ -159,15 +157,7 @@ class IPv4:
         else:
             mf_bool = False
         if recursive:
-            if protocol == "udp":
-                payload = UDP.udp_parser(data[20:])
-            elif protocol == "tcp":
-                payload = TCP.tcp_parser(data[20:])
-            else:
-                try:
-                     payload = data[20:].decode("ascii")
-                except UnicodeDecodeError:
-                    payload = data[20:]
+            parse_further_layers()
         else:
             payload = data[20:]
 
@@ -175,6 +165,22 @@ class IPv4:
                           length=length, dscp=dscp, ecn=ecn, version=version, checksum=checksum)
         returnable.ihl = ihl
         return returnable
+    
+    def parse_further_layers(self, recursive):
+        """
+        Method that parses higher layers
+        :param recursive - boolean value of whether parsing funciton should
+        be called recursively through all layers
+        """
+        if protocol == "udp":
+            self.payload = UDP.udp_parser(data[20:], recursive)
+        elif protocol == "tcp":
+            self.payload = TCP.tcp_parser(data[20:], recursive)
+        else:
+            try:
+                self.payload = data[20:].decode("ascii")
+            except UnicodeDecodeError:
+                self.payload = data[20:]
 
     def reset_calculated_fields(self):
         """

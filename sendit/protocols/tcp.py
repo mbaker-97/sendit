@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.2"
+__version__ = "1.0.4"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -344,10 +344,7 @@ class TCP:
             options = (None,None,None,None,None)
 
         if recursive:
-            try:
-                payload = data[offset*4:].decode("ascii")
-            except UnicodeDecodeError:
-                payload = data[offset*4:]
+            parse_further_layers()
         else:
             payload = data[offset*4:]
 
@@ -358,7 +355,22 @@ class TCP:
                          sack=options[3],stamp=options[4])
 
         return returnable
-    
+
+
+    def parse_further_layers(self, recursive=True): 
+        """
+        Method that parses higher layers
+        :param recursive - boolean value of whether parsing funciton should
+        be called recursively through all layers
+        """
+        
+        try:
+            self.payload = data[offset*4:].decode("ascii")
+        except UnicodeDecodeError:
+            self.payload = data[offset*4:]
+
+
+
     def reset_calculated_fields(self):
         """
         Resets calculated fields for TCP - resets checksum and length

@@ -2,12 +2,12 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.2"
+__version__ = "1.0.4"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
 from struct import pack, unpack
-from sendit.helper_functions.helper import bytes_to_MAC, is_valid_MAC, addr_to_bytes
+from sendit.helper_functions.helper import *
 from sendit.protocols.arp import ARP
 from sendit.protocols.ipv4 import IPv4
 from sendit.protocols.ipv6 import IPv6
@@ -66,7 +66,7 @@ class EtherFrame:
         etype = EtherFrame.ethertype_to_bytes.get(self.etype)
         # If custom ethertype
         if etype is None:
-            etype = bytes.fromhex(str(self.etype))
+            etype = bytes.fromhex(self.etype)
 
         try:
             payload = self.payload.as_bytes()
@@ -85,6 +85,22 @@ class EtherFrame:
         else:
             return dst + src + etype + payload + padding
 
+    def parse_further_layers(self, recursive=True):
+        """
+        Method that parses higher layers
+        :param recursive - boolean value of whether parsing funciton should
+        be called recursively through all layers
+        """
+            # If ARP, parse ARP
+        if self.etype == "arp":
+            return ARP.arp_parser(self.payload)
+        # If IPv4, parse IPv4
+        elif self.etype == "ipv4":
+            return  IPv4.ipv4_parser(self.payload, recursive=recursive)
+        elif self.etype == "ipv6":
+            return IPv6.ipv6_parser(self.payload, recursive=recursive)
+        else:
+            return data[14:]
     @classmethod
     def etherframe_parser(cls, data, recursive=True):
         """
@@ -98,29 +114,20 @@ class EtherFrame:
         src = bytes_to_MAC(data[6:12])
         type_bytes = data[12:14]
 
-        type = EtherFrame.bytes_to_ethertype.get(type_bytes)
+        etype = EtherFrame.bytes_to_ethertype.get(type_bytes)
 
         # Type not currently built in to EtherFrame class
-        if type is None:
-            type = int(hex(int.from_bytes(type_bytes, 'big'))[2:])
+        if etype is None:
+            etype = hex(int.from_bytes(type_bytes, 'big'))[2:]
         rest = data[14:]
 
+        payload = data[14:]
+
+        returnable = EtherFrame(dst, src, payload, ethertype=etype)
         if recursive:
-             # If ARP, parse ARP
-            if type == "arp":
-                 payload = ARP.arp_parser(rest)
-            # If IPv4, parse IPv4
-            elif type == "ipv4":
-                payload = IPv4.ipv4_parser(rest)
-            elif type == "ipv6":
-                 payload = IPv6.ipv6_parser(rest)
-            else:
-                payload = data[14:]
-        else:
-            payload = data[14:]
-
-                
-
-        returnable = EtherFrame(dst, src, payload, ethertype=type)
+            returnable.payload = returnable.parse_further_layers()
         return returnable
+
+
+
 

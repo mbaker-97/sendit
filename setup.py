@@ -5,7 +5,7 @@ with open("README.md", 'r') as file:
 
 setup(
         name='sendit',
-        version='1.0.2',
+        version='1.0.3',
         author='Matt Baker',
         author_email="mbakervtech@gmail.com",
         description="A package that provides easy access to forming and sending custom messages from Layer 2 to Layer 4",

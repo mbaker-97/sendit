@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.2"
+__version__ = "1.0.4"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -87,14 +87,21 @@ class UDP:
         length = int.from_bytes(data[4:6], 'big')
         checksum = int.from_bytes(data[6:8], 'big')
         if recursive:
-            try:
-                payload = data[8:].decode("ascii")
-            except UnicodeDecodeError:
-                payload = data[8:]
+            parse_further_layers()
         else:
             payload = data[8:]
         returnable = UDP(src, dst, "0.0.0.0", "0.0.0.0", payload, length=length, checksum=checksum)
         return returnable
+    def parse_further_layers(self, recursive):
+        """
+        Method that parses higher layers
+        :param recursive - boolean value of whether parsing funciton should
+        be called recursively through all layers
+        """
+        try:
+            self.payload = data[8:].decode("ascii")
+        except UnicodeDecodeError:
+            self.payload = data[8:]
 
     def reset_calculated_fields(self):
         """

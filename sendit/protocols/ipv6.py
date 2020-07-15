@@ -1,8 +1,8 @@
-# Provides object of IPv6 protocol
+
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.2"
+__version__ = "1.0.4"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -127,16 +127,7 @@ class IPv6:
             protocol = next
 
         if recursive:
-
-            if protocol == "udp":
-                payload = UDP.udp_parser(data[40:])
-            elif protocol == "tcp":
-                payload = TCP.tcp_parser(data[40:])
-            else:
-                try:
-                    payload = data[40:].decode("ascii")
-                except UnicodeDecodeError:
-                    payload = data[40:]
+            parse_further_layers()
         else:
             payload = data[40:]
 
@@ -144,3 +135,19 @@ class IPv6:
                           version=version, length=length)
 
         return returnable
+    def parse_further_layers(self, recursive=True):
+        """
+        Method that parses higher layers
+        :param recursive - boolean value of whether parsing funciton should
+        be called recursively through all layers
+        """
+
+        if protocol == "udp":
+            self.payload = UDP.udp_parser(data[40:], recursive)
+        elif protocol == "tcp":
+            self.payload = TCP.tcp_parser(data[40:], recursive)
+        else:
+            try:
+                self.payload = data[40:].decode("ascii")
+            except UnicodeDecodeError:
+                self.payload = data[40:]
