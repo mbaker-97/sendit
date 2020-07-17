@@ -12,8 +12,10 @@ from sendit.helper_functions.helper import *
 
 if __name__ == "__main__":
     interface = "wlan0"
-    macs = [get_MAC(interface), BROADCAST_MAC]
-    listener = Ethernet_Listener(macs,ipv4=False)
-    listener.listen(interface)
+    my_mac = get_MAC(interface)
+    macs = [my_mac, BROADCAST_MAC]
+    mappings = {get_ip(interface): my_mac, "192.168.1.154": my_mac} 
+    listener = Ethernet_Listener(macs,interface, ipv4=False, arp_reply=True, arp_mappings = mappings) 
+    listener.listen()
 
 

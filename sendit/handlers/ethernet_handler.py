@@ -18,14 +18,18 @@ from queue import Queue
 
 class Ethernet_Listener():
 
-    def __init__(self, macs, ipv4=True, ipv6=False, arp=True, arp_reply=False ):
+    def __init__(self, macs, interface, ipv4=True, ipv6=False, arp=True, arp_reply=False, arp_mappings=None):
+        if arp_reply and arp_mappings is None:
+            raise ValueError("When arp_reply is set  to True, arp_mappings must be provided")
         self.macs = macs
+        self.interface = interface
         self.ipv4 = ipv4
         self.ipv6 = ipv6
         self.arp = arp
         self.threads = dict()
         self.queues = dict()
         self.arp_reply = arp_reply
+        self.arp_mappings = arp_mappings
 
         for mac in self.macs:
             self.create_threads(mac)
@@ -45,15 +49,15 @@ class Ethernet_Listener():
             #  queues[thread.name, queue]
         if self.arp:
             queue = Queue(maxsize=0)
-            arp_list = ARP_Listener(queue, reply=self.arp_reply)
+            arp_list = ARP_Listener(queue, interface=self.interface,  reply=self.arp_reply, mappings=self.arp_mappings)
             thread = Thread(target=arp_list.listen, name=mac+"_arp")
             thread.start()
             self.threads[thread.name] =  thread
             self.queues[thread.name] =  queue
 
-    def listen(self, interface):
+    def listen(self):
         #Raw Nic will be created here
-        nic = Raw_NIC(interface)
+        nic = Raw_NIC(self.interface)
         print(enumerate())
         while True:
             # Receive maximum amount of bytes

@@ -97,11 +97,3 @@ class ARP:
         return "\n".join((header, sha, tha, spa, tpa, hln, pln, op, pro, hrd, trailer))
 
         
-
-
-
-
-
-
-
-
