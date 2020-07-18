@@ -1,4 +1,5 @@
 #!/bin/python3
+# Runs basic ARP Daemon
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
@@ -8,14 +9,19 @@ __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
 from sendit.helper_functions.helper import *
 from sendit.handlers.ethernet_handler import Ethernet_Listener
-from sendit.helper_functions.helper import *
+from sendit.handlers.arp_handler import ARP_Listener
+from sendit.helper_functions.helper import BROADCAST_MAC, get_ip, get_MAC
 
 if __name__ == "__main__":
     interface = "wlan0"
     my_mac = get_MAC(interface)
     macs = [my_mac, BROADCAST_MAC]
     mappings = {get_ip(interface): my_mac, "192.168.1.154": my_mac} 
-    listener = Ethernet_Listener(macs,interface, ipv4=False, arp_reply=True, arp_mappings = mappings) 
+
+    arp_listener = ARP_Listener(interface=interface, mappings=mappings)
+
+    protocols = {my_mac: [arp_listener], BROADCAST_MAC: [arp_listener]} 
+    listener = Ethernet_Listener(interface, protocols)
     listener.listen()
 
 
