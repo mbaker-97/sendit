@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -83,6 +83,8 @@ if __name__ == '__main__':
     l2.payload = l3_6  # switch payload of EtherFrame to IPv6 object
     l2.etype = "ipv6"  # switch ethertype of etherframe to IPv6 type
     nic.send(l2)  # Send it!
+    l22 = EtherFrame.etherframe_parser(l2.as_bytes())
+    nic.send(l22)  # Check that recreated parsed data looks the same
     # To here
 
     # Example 6 - change payload to use udp over IPv6
@@ -95,5 +97,7 @@ if __name__ == '__main__':
     l3_6.next = "udp"  # Switch the protocol held within IPv6 object
     l3_6.reset_calculated_fields()  # Reset calculated fields (length)
     nic.send(l2)  # Send it!
+    l22 = EtherFrame.etherframe_parser(l2.as_bytes())
+    nic.send(l22)  # Check that recreated parsed data looks the same
     # To here
 

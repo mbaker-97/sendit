@@ -1,12 +1,12 @@
 # sendit
-Provides easy access to forming and sending custom Ethernet frame, ARP messages, IPv4 packets, and TCP/UDP Segments
+Provides easy access to forming and sending custom Ethernet frame, ARP messages, IPv4 packets, and TCP/UDP Segments, as well as listening and responding to those protocols
 
 ## Getting Started
 To confirm what you are sending, open up a network analysis tool like Wireshark.
 
 To Install use pip:
 ```
-pip install sendit==1.0.2
+pip install sendit==1.0.5
 ```
 ### Sending data over TCP
 
@@ -27,9 +27,10 @@ l2 = EtherFrame("AA:BB:CC:DD:EE:FF", "00:11:22:33:44:55", l3) # Change 1st mac t
 nic.send(l2) # Send payload - open up Wireshark to see your payload
  ```
  
- In this example, l4_tcp, a TCP instance takes our string as payload. This is then put into l3, an IPv4 instance. l3 is then placed into l2, an EtherFrame instance. 
+In this example, l4_tcp, a TCP instance takes our string as payload. This is then put into l3, an IPv4 instance. l3 is then placed into l2, an EtherFrame instance. 
  
 Every field and flag in these protocols can be changed, or left at their default values.
+
 
 
 ### Sending an ARP request
@@ -43,6 +44,29 @@ arp = ARP("AA:BB:CC:DD:EE:FF", "192.168.1.1", BROADCAST_MAC, "192.168.1.2")
 l2 = EtherFrame("AA:BB:CC:DD:EE:FF", "00:11:22:33:44:55", arp, type="arp")
 nic.send(l2)
 ```
+
+### Creating a Responder to ARP Messages:
+```
+interface = "wlan0"
+my_mac = get_MAC(interface)
+mappings = {get_ip(interface): my_mac, "192.168.1.8": my_mac}
+
+arp_listener = ARP_Listener(interface=interface, mappings=mappings, reply=True)
+
+protocols = {my_mac: [arp_listener], BROADCAST_MAC: [arp_listener]}
+listener = Ethernet_Listener(interface, protocols)
+listener.listen()
+```
+This was adapted from applications/arp_daemon.py
+
+First, we define the string name of the interface we want to listen on and respond to ARP messages on
+In line 2, we grab the MAC on that NIC. 
+In line 3 we create a dictionary mapping IP addresses to MACs to use to know what IPs to listen for and reply to with the ARP_Listener. Note that we are listening for our IP as well as 192.168.1.8, which may not be an IP for this device. The MACs we are using do not necessarily have to belong to this device either.
+In line 5 we create out ARP_Listener. We set reply to true so that replies are sent out
+In Line 7 we create a dictionary mapping MAC addresses to layer 3 protocol listeners. Here we set the arp_listener to get arp messages that have an Ethernet destination of my_mac or BROADCAST_MAC
+In line 8 we create out Ethernet Listener, passing it the name of the interface to listen on and our mappings of higher layer listeners to MAC addresses
+In line 9, we start the Ethernet Listener, which in turns starts the ARP_Listener, and now we are answering ARP replies for our IP and 192.168.1.8, matching it to my_mac
+
 ## Using ARPMap
 ![](docs/images/arp_map.png)
 

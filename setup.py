@@ -5,10 +5,10 @@ with open("README.md", 'r') as file:
 
 setup(
         name='sendit',
-        version='1.0.3',
+        version='1.0.5',
         author='Matt Baker',
         author_email="mbakervtech@gmail.com",
-        description="A package that provides easy access to forming and sending custom messages from Layer 2 to Layer 4",
+        description="A package that provides easy access to forming, sending, and listening to custom messages from Layer 2 to Layer 4",
         long_description=long_description,
         long_description_content_type="text/markdown",
         url="https://github.com/mbaker-97/networkingpy",

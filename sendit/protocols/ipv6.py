@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -87,11 +87,15 @@ class IPv6:
         if self.length == 0:
             self.length = len(payload)
 
-        next = protocols_to_int.get(self.next.lower())
+        nxt = protocols_to_int.get(str(self.next).lower())
+
+        # Until time for error handling, trust users custom input
+        if nxt is None:
+            nxt = self.next
         limit_bytes = self.limit.to_bytes(1, 'big')
         src_bytes = IPv6Address(self.src).packed
         dst_bytes = IPv6Address(self.dst).packed
-        return pack('!BBHHBB', first_byte, second_byte, flow_label_bytes, self.length, next, self.limit) + \
+        return pack('!BBHHBB', first_byte, second_byte, flow_label_bytes, self.length, nxt, self.limit) + \
                src_bytes + dst_bytes + payload
 
     def reset_calculated_fields(self):
@@ -126,15 +130,15 @@ class IPv6:
         if protocol is None:
             protocol = next
 
-        if recursive:
-            parse_further_layers()
-        else:
-            payload = data[40:]
 
-        returnable = IPv6(src, dst, payload, next=protocol, limit=limit, flow_label=flow_label, ds=ds, ecn=ecn,
+        returnable = IPv6(src, dst, data[40:], next=protocol, limit=limit, flow_label=flow_label, ds=ds, ecn=ecn,
                           version=version, length=length)
+        
+        if recursive:
+            returnable.parse_further_layers()
 
         return returnable
+
     def parse_further_layers(self, recursive=True):
         """
         Method that parses higher layers
@@ -142,12 +146,41 @@ class IPv6:
         be called recursively through all layers
         """
 
-        if protocol == "udp":
-            self.payload = UDP.udp_parser(data[40:], recursive)
-        elif protocol == "tcp":
-            self.payload = TCP.tcp_parser(data[40:], recursive)
+        if self.next == "udp":
+            self.payload = UDP.udp_parser(self.payload, recursive)
+        elif self.next == "tcp":
+            self.payload = TCP.tcp_parser(self.payload, recursive)
         else:
             try:
-                self.payload = data[40:].decode("ascii")
+                self.payload = self.payload.decode("ascii")
             except UnicodeDecodeError:
-                self.payload = data[40:]
+                pass 
+
+    def __str__(self):
+        """
+        Create string representation of IPv6 object
+        """
+        header = "*" * 20 + "_IPv6_" + "*" * 20
+        source = "Source Address: " + str(ip_address(self.src)).upper()
+        dest = "Destination Address: " + str(ip_address(self.dst)).upper()
+        length = "Payload Length: " + str(self.length) + " bytes"
+        nxt = "Next Header: " + str(self.next).upper()
+        limit = "Hop Limit: " + str(self.limit)
+        label = "Flow Label: " + str(self.flow_label)
+        differ = "Differentiated Services: " + hex(self.ds)[2:]
+        ecn = "Explicit Congestion Notification: " + str(self.ecn)
+        if self.ecn == 0:
+            ecn = " ".join((ecn,("(Non-ECN Capable)")))
+        if self.ecn == 1 or self.ecn == 2 :
+            ecn = " ".join((ecn,("(ECN Capable)")))
+        if self.ecn == 3:
+            ecn = " ".join((ecn,("(Congestion Encountered)")))
+        version = "Version: " + str(self.version)
+        trailer = "*" * 46
+
+        return "\n".join((header, source, dest, length, nxt, limit, label, differ, ecn, version, trailer))
+
+
+
+
+

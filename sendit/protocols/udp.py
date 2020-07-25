@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -86,22 +86,23 @@ class UDP:
         dst = int.from_bytes(data[2:4], 'big')
         length = int.from_bytes(data[4:6], 'big')
         checksum = int.from_bytes(data[6:8], 'big')
+        returnable = UDP(src, dst, "0.0.0.0", "0.0.0.0", data[8:], length=length, checksum=checksum)
+
         if recursive:
-            parse_further_layers()
-        else:
-            payload = data[8:]
-        returnable = UDP(src, dst, "0.0.0.0", "0.0.0.0", payload, length=length, checksum=checksum)
+            returnable.parse_further_layers()
+
         return returnable
-    def parse_further_layers(self, recursive):
+
+    def parse_further_layers(self, recursive=True):
         """
         Method that parses higher layers
-        :param recursive - boolean value of whether parsing funciton should
+        :param recursive - boolean value of whether parsing funciton should - default of True
         be called recursively through all layers
         """
         try:
-            self.payload = data[8:].decode("ascii")
+            self.payload = self.payload.decode("ascii")
         except UnicodeDecodeError:
-            self.payload = data[8:]
+            pass
 
     def reset_calculated_fields(self):
         """
@@ -109,3 +110,21 @@ class UDP:
         """
         self.checksum = 0
         self.length = 0
+
+    def __str__(self):
+        """
+        Create string representation of IPv4 object
+        :return: string of IPv4
+        """
+        header = "*" * 20 + "_UDP_" + "*" * 20
+        src = "Source: " + str(self.src_prt)
+        dst = "Destination: "  + str(self.dst_prt)
+        length = "Length:" + str(self.length)
+        trailer = "*" * 45
+        return "\n".join((header, src, dst, length, trailer))
+
+
+
+
+
+

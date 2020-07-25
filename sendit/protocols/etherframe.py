@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -127,6 +127,20 @@ class EtherFrame:
         if recursive:
             returnable.payload = returnable.parse_further_layers()
         return returnable
+
+    def __str__(self):
+        """
+        Create string representation of EtherFrame
+        :return: String representation of EtherFrame
+        """
+        header = "*" * 20 + "_Ethernet Frame_" + "*" * 20
+        source = "Source address: " + self.src.upper()
+        dest = "Destination address: " + self.dst.upper()
+        etype = "Type: " + self.etype.upper()
+        trailer = "*" * 56
+
+        return "\n".join((header, source, dest, etype, trailer))
+
 
 
 

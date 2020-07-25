@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -14,7 +14,7 @@ from queue import Queue
 
 class Ethernet_Listener():
 
-    def __init__(self, interface, protocols ):
+    def __init__(self, interface, protocols): 
         """
         Constructor for Ethernet_Listener
         :param interface: string of interface to be listening on

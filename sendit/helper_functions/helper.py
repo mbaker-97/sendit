@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -18,8 +18,8 @@ from socket import *
 import pathlib
 BROADCAST_MAC = "FF:FF:FF:FF:FF:FF"
 BROADCAST_IPV4 = "255.255.255.255"
-protocols_to_int = {"icmp": 1, "tcp": 6, "udp": 17}
-int_to_protocol = {1: "icmp", 6: "tcp", 17: "udp"}
+protocols_to_int = {"icmp": 1, "tcp": 6, "udp": 17, "icmpv6": 58}
+int_to_protocol = {1: "icmp", 6: "tcp", 17: "udp", 58:"icmpv6"}
 # Brute Force search .... sort csv and FIX!
 def MAC_to_manufacturer(address):
     """

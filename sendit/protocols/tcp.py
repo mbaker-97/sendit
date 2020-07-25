@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -343,16 +343,15 @@ class TCP:
         else:
             options = (None,None,None,None,None)
 
-        if recursive:
-            parse_further_layers()
-        else:
-            payload = data[offset*4:]
 
-        returnable = TCP(src, dst, "0.0.0.0", "0.0.0.0", window, payload, sqn=sqn, ack_num=ack_num,
+        returnable = TCP(src, dst, "0.0.0.0", "0.0.0.0", window, data[offset*4:], sqn=sqn, ack_num=ack_num,
                          ns=flag_bool[0], cwr=flag_bool[1], ece=flag_bool[2], urg=flag_bool[3], ack=flag_bool[4],
                          psh=flag_bool[5], rst=flag_bool[6], syn=flag_bool[7], fin=flag_bool[8], urg_pnt=urg_pnt,
                          checksum=checksum, offset=offset, mss=options[0], scaling=options[1], sack_permitted=options[2],
                          sack=options[3],stamp=options[4])
+
+        if recursive:
+            returnable. parse_further_layers()
 
         return returnable
 
@@ -365,10 +364,9 @@ class TCP:
         """
         
         try:
-            self.payload = data[offset*4:].decode("ascii")
+            self.payload = self.payload.decode("ascii")
         except UnicodeDecodeError:
-            self.payload = data[offset*4:]
-
+            pass
 
 
     def reset_calculated_fields(self):
@@ -377,3 +375,35 @@ class TCP:
         """
         self.checksum = 0
         self.offset = 5
+
+    def __str__(self):
+        """
+        Create string representation of IPv4 object
+        :return: string of IPv4
+        """
+        header = "*" * 20 + "_UDP_" + "*" * 20
+        src = "Source: " + str(self.src_prt)
+        dst = "Destination: "  + str(self.dst_prt)
+        length = "Length: " + str(self.length)
+        sqn = "Sequence: " + str(self.sqn)
+        ack_num = "Acknowledgment: " + str(self.ack_num)
+        flags = "Flags: "
+        separator = "-"*20
+        urg = "Urgent: " + str(self.urg)
+        ack = "Acknowledge: " + str(self.ack)
+        psh = "Push: " + str(self.psh)
+        rst = "Reset: " + str(self.rst)
+        syn = "Syn: " + str(self.syn)
+        fin = "Fin: " + str(self.fin)
+        window = "Window: "  + str(self.window)
+        offset = "Data Offset: " + str(self.offset) + " 32 bit words"
+        urg_pnt = "Urgent Pointer: " + str(self.urg_pnt)
+
+        trailer = "*" * 45
+
+        return "\n".join((header, src, dst, length, sqn, ack_num, flags, 
+            separator, urg, ack, psh, rst, syn, fin, separator, window, offset,
+            urg_pnt, trailer))
+
+
+

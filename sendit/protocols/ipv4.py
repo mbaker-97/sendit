@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -99,7 +99,7 @@ class IPv4:
             except AttributeError:
                 self.length = len(payload) + self.ihl * 4
 
-        frag_bytes = int(bin(flags)[2:].zfill(3) + bin(self.offset)[2:].zfill(13), 2)
+        frag_bytes = int(bin(flags)[2:].zfill(3) + bin(self.offset/8)[2:].zfill(13), 2)
         protocol = protocols_to_int.get(str(self.protocol).lower())
 
         # Until time for error handling, trust users custom input
@@ -117,11 +117,28 @@ class IPv4:
         return pack('!BBHHHBBH', first_byte, second_byte, self.length, self.id, frag_bytes, self.ttl, protocol,
                            self.checksum) + src + dst + payload
 
+    def parse_further_layers(self, recursive = True):
+        """
+        Method that parses higher layers
+        :param recursive: - boolean value of whether parsing funciton should - default of True
+        be called recursively through all layers
+        """
+        if self.protocol == "udp":
+            self.payload = UDP.udp_parser(self.payload, recursive)
+        elif self.protocol == "tcp":
+            self.payload = TCP.tcp_parser(self.payload, recursive)
+        else:
+            try:
+                self.payload = self.payload.decode("ascii")
+            except UnicodeDecodeError:
+                pass
+
     @classmethod
     def ipv4_parser(cls, data, recursive=True):
         """
         Class Method that parses group of bytes to create IPv4 Object
-        :param data: ipv4 packet passed in as bytes
+        :param recursive: boolean of whether to parse recursively to higher
+        layers - default is True
         If protocol is "TCP", payload will be TCP object created
         If protocol is "UDP", payload will be UDP object created
         :return: IPv4 instance that contains the values that was in data
@@ -129,12 +146,12 @@ class IPv4:
         version = int.from_bytes(data[0:1], 'big') >> 4
         ihl = int.from_bytes(data[0:1], 'big') % 64
         dscp = int.from_bytes(data[1:2], 'big') >> 5
-        ecn = int.from_bytes(data[1:2], 'big')
+        ecn = int.from_bytes(data[1:2], 'big') % 4
         length = int.from_bytes(data[2:4], 'big')
         id = int.from_bytes(data[4:6], 'big')
         df = int.from_bytes(data[6:7], 'big') >> 6
         mf = (int.from_bytes(data[6:7], 'big') >> 5) % 2
-        offset = int.from_bytes(data[6:8], 'big') % 8092
+        offset = (int.from_bytes(data[6:8], 'big') % 8192) * 8
         ttl = int.from_bytes(data[8:9], 'big')
 
         protocol_num = int.from_bytes(data[9:10], 'big')
@@ -156,35 +173,52 @@ class IPv4:
             mf_bool = True
         else:
             mf_bool = False
-        if recursive:
-            parse_further_layers()
-        else:
-            payload = data[20:]
 
-        returnable = IPv4(src, dst, payload, id=id, df=df_bool, mf=mf_bool, offset=offset, ttl=ttl, protocol=protocol,
+        returnable = IPv4(src, dst, data[20:], id=id, df=df_bool, mf=mf_bool, offset=offset, ttl=ttl, protocol=protocol,
                           length=length, dscp=dscp, ecn=ecn, version=version, checksum=checksum)
+
+        if recursive:
+            returnable.parse_further_layers()
+
         returnable.ihl = ihl
+
         return returnable
     
-    def parse_further_layers(self, recursive):
-        """
-        Method that parses higher layers
-        :param recursive - boolean value of whether parsing funciton should
-        be called recursively through all layers
-        """
-        if protocol == "udp":
-            self.payload = UDP.udp_parser(data[20:], recursive)
-        elif protocol == "tcp":
-            self.payload = TCP.tcp_parser(data[20:], recursive)
-        else:
-            try:
-                self.payload = data[20:].decode("ascii")
-            except UnicodeDecodeError:
-                self.payload = data[20:]
-
     def reset_calculated_fields(self):
         """
         Resets calculated fields for IPv4 - resets length and checksum
         """
         self.checksum = 0
         self.length = 0
+
+    def __str__(self):
+        """
+        Create string representation of IPv4 object
+        :return: string of IPv4
+        """
+        header = "*" * 20 + "_IPv4_" + "*" * 20
+        source = "Source Address: " + self.src
+        dest = "Destination Address: " + self.dst
+        length = "Length: " + str(self.length) + " bytes"
+        protocol = "Protocol: " + str(self.protocol)
+        ttl = "TTL: " + str(self.ttl)
+        flags = "Flags: Don't Fragment: " + str(self.df) + " More Fragments: " + str(self.mf)
+        offset = "Fragment Offset: " + str(self.offset) + " bytes"
+        ident = "ID: " + str(self.id)
+        ecn = "Explicit Congestion Notification: " + str(self.ecn)
+        if self.ecn == 0:
+            ecn = " ".join((ecn,("(Non-ECN Capable)")))
+        if self.ecn == 1 or self.ecn == 2 :
+            ecn = " ".join((ecn,("(ECN Capable)")))
+        if self.ecn == 3:
+            ecn = " ".join((ecn,("(Congestion Encountered)")))
+        differ = "Differentiated Services: " + hex(self.df)[2:]
+        hl = "Header length: " + str(self.ihl)
+        checksum = "Checksum: " + hex(self.checksum)[2:]
+        version = "Version: "  + str(self.version)
+        trailer = "*" * 46
+        return "\n".join((header, source, dest, length, protocol, ttl, flags,
+                          offset, ident, ecn, differ, checksum,  hl, version, trailer))
+
+
+
