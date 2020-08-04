@@ -151,6 +151,7 @@ class TCP:
         nop (No-op) bytes to fit in 32 bit word
 
         TODO handle sack value
+
         :return: tuple consisting of bytes of options for this TCP segment and increase to options header
         :rtype: tuple of bytes
         """
@@ -239,6 +240,7 @@ class TCP:
         """
         Converts TCP to proper format of payload bytes to send
         self.payload is converted to bytes with str.encode(self.payload)
+
         :return: bytes representation of TCP
         :rtype: bytes
         """
@@ -299,6 +301,7 @@ class TCP:
     def parse_options(self, option_bytes):
         """
         Parses TCP header options from a series of byte
+
         :param option_bytes: series of bytes containing TCP Header options
         :type option_bytes: bytes
         :return: list of options to return containing [MSS, Window Scale, \
@@ -353,6 +356,7 @@ class TCP:
     def tcp_parser(cls, data, recursive=True):
         """
         Class method that creates TCP object
+
         :param data: TCP segment passed in as bytes
         :type param: bytes
         :return: TCP object created from values in data
@@ -408,6 +412,7 @@ class TCP:
         """
         Method that parses higher layers and sets the payload of calling TCP
         object
+
         :param recursive: boolean value of whether parsing function should \
             be called recursively through all layers
         :type recursive: true
@@ -429,6 +434,7 @@ class TCP:
     def __str__(self):
         """
         Create string representation of TCP object
+
         :return: string of TCP
         :rtype: String
         """

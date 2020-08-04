@@ -30,6 +30,7 @@ def ARP_recv(nic):
     """
     Function that receives and prints out ARP replies:  MAC address, IP address,
     and Manufacturer of MAC
+
     :param nic: nic to receive ARP replies on
     :type nic: Raw_NIC
     """
@@ -53,6 +54,7 @@ def ARP_map(network, prefix, interface, mac, ip, rand=False, delay=0.0):
     Sends out ARP requests across a network, effectively allowing a user to map\
     out hosts on local subnet
     Can be used to root out hosts with duplicate IPs
+
     :param interface: Name of interface to send ARPs out of
     :type interface: String name of interface
     :param network: Network IP address

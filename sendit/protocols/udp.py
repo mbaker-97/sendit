@@ -64,6 +64,7 @@ class UDP:
         """
         Converts UDP to proper format of payload bytes to send
         self.payload is converted to bytes with str.encode(self.payload)
+
         :return: bytes representation of UDP
         :rtype: bytes
         """
@@ -93,6 +94,7 @@ class UDP:
     def udp_parser(cls, data, recursive=True):
         """
         Class method that creates UDP object
+
         :param data: UDP segment passed in as bytes
         :type data: bytes
         :return: UDP object created from values in data
@@ -113,9 +115,10 @@ class UDP:
     def parse_further_layers(self, recursive=True):
         """
         Method that parses higher layers
-        :param recursive: boolean value of whether parsing funciton should - default of True
+
+        :param recursive: boolean value of whether parsing function should be \
+            called through higher layers, defaults to True
         :type recursive: boolean
-        be called recursively through all layers
         """
         try:
             self.payload = self.payload.decode("ascii")
@@ -132,6 +135,7 @@ class UDP:
     def __str__(self):
         """
         Create string representation of UDP object
+
         :return: string of UDP
         :rtype: String
         """

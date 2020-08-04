@@ -12,8 +12,10 @@ class UDP_Listener():
 
     """
     :param ports: - list of ports to listen on
+    :type ports: list of ints
     :param listeners: default of None, dictionary mapping list of upper \
         layer listeners to UDP to forward frames to
+    :type listeners: dictionary of listener objects
     """
 
     def __init__(self, ports, listeners=None):
@@ -26,6 +28,7 @@ class UDP_Listener():
     def listen(self, queue):
         """
         Listen for frames coming in on queue to parse the UDP objects inside
+
         :param queue: Queue to listen in on
         :type queue: Queue object
         """

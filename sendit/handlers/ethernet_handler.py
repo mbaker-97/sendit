@@ -40,6 +40,7 @@ class Ethernet_Listener():
         creates threads for each upper layer listener provided in protocols
         list. Also appends threads and queues created to self.threads and 
         self.queues
+
         :param mac: string mac address to create thread and queue for
         :type mac: String
         :param protocols: list of higher layer protocol listeners that need \
@@ -109,6 +110,7 @@ class Ethernet_Listener():
         """
         Remove MAC address from list of macs that listener will listen for
         Removes corresponding entries in self.mac, self.queues, and self.threads
+
         :param mac: string of mac address to remove
         :type mac: String
         """
@@ -138,6 +140,7 @@ class Ethernet_Listener():
         """
         Remove upper layer listener from Ethernet_Listener
         Removes corresponding entries in self.threads and self.queues, and if no more entries for a particular mac, corresponding mac is also removed from self.macs
+
         :param mac: string of mac address to remove corresponding listener
         :type mac: String
         :param protocol: protocol of listener to remove
@@ -173,6 +176,7 @@ class Ethernet_Listener():
     def add_listener(self, mac, listener):
         """
         Add a higher protocol layer listener into ethernet listener for management
+
         :param mac: mac address to listen on
         :type mac: String
         :param listener: listener object to add

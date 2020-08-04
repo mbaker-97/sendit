@@ -55,6 +55,7 @@ class ARP_Listener():
         """
         listens and responds for ARP messages coming in on queue, put there by
         an ethernet_handler
+
         :param queue: Queue which will contain EtherFrames with ARP messages \
             in them
         :type queue: Queue

@@ -42,9 +42,10 @@ class IPv4_Listener():
 
     def ip_fragmentation_handler(self, frame):
         """
-        Piece back together fragmented packets
-        This is a modified version of the algorithm defined in RFC 815
+        This pieces back together fragmented packets. \
+        This is a modified version of the algorithm defined in RFC 815 \
         https://tools.ietf.org/html/rfc815
+
         :param frame: ethernet frame that contains fragmented packet
         :type frame: EtherFrame
         """
@@ -110,6 +111,7 @@ class IPv4_Listener():
         Otherwise, they are discarded
         If frames come in with IPv4 fragmented, they are sent to ip_fragmentation_handler
         to be handled
+
         :param queue: Queue object to listen for incoming frames on
         :type queue: Queue object
         """

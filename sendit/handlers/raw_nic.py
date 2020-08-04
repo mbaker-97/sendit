@@ -31,6 +31,7 @@ class Raw_NIC(socket):
         Attempts to use as_bytes() method that is provided by all protocol classes in this library
         If not a class in this libary, calls str.encode on provided frame
         Them sends on raw socket
+
         :param frame: frame to send on Raw_NIC
         :type frame: L2 object that has as_bytes function, such as Etherframe
         """
@@ -68,6 +69,7 @@ class Async_Raw_NIC(socket):
         Attempts to use as_bytes() method that is provided by all protocol classes in this library
         If not a class in this libary, calls str.encode on provided frame
         Them sends on raw socket
+
         :param frame: frame to send on Raw_NIC
         :type frame: L2 object that has as_bytes function, such as Etherframe
         """
@@ -82,6 +84,7 @@ class Async_Raw_NIC(socket):
     async def recv(self, n_bytes, queues = None):
         """
         Asynchronously receive bytes
+        
         :param queues: queues to send raw bytes to 
         :type queue: asyncio.queue
         :param n_bytes: Number of bytes to receive

@@ -15,6 +15,7 @@ from sendit.helper_functions.helper import *
 class IPv4:
     """
     Creates IPv4 object from parameters
+
     :param src: source IP address
     :type src: String
     :param dst: destination IP address
@@ -23,11 +24,11 @@ class IPv4:
     :type payload: TCP or UDP objects of String
     :param id: identification number of packet, defaults to 0
     :type id: int
-    :param length:total  length of IP packet in bytes - header + data together.\
-            ,defaults to 0, calculated when as_bytes called. If IPv4 object \
-            created from parser function, takes value of captured IPv4 packet,\
-                   and NOT calculated in as_bytes unless reset to 0 manually \
-                   with reset_calculated_fields
+    :param length: total  length of IP packet in bytes - header + data together,\
+         defaults to 0, calculated when as_bytes called. If IPv4 object created\
+         from parser function, takes value of captured IPv4 packet, and NOT \
+        calculated in as_bytes unless reset to 0 manually with \
+        reset_calculated_fields
     :type length: int
     :param df: do not fragment flag, default to False
     :type df: Boolean
@@ -38,8 +39,8 @@ class IPv4:
     :param ttl: time to live, default to 64
     :type ttl: int
     :param protocol: string name of protocol carried in packet.currently \
-            supported values: "tcp", "udp", "icmp", custom int value accepted \
-            IF valid
+        supported values: "tcp", "udp", "icmp", custom int value accepted IF \
+        valid
     :type protocol: String or int
     :param dscp: differentiated services value - default of 0
     :type dscp: int
@@ -48,11 +49,12 @@ class IPv4:
     :param version: version of IP
     :type version: int
     :param checksum: checksum of packet. By default, not calculated and set to \
-            0 and to be calculated when as_bytes called. Set when IPv4 object \
-            created from parser function, and unless reset manually or with \
-            reset_calculated_fields function, will NOT be recalculated when \
-            as_bytes is called
+        0 and to be calculated when as_bytes called. Set when IPv4 object \
+        created from parser function, and unless reset manually or with \
+        reset_calculated_fields function, will NOT be recalculated when \
+        as_bytes is called
     :type checksum: int
+
     """
 
     def __init__(self, src, dst, payload, id=0, length=0, df=False, mf=False, offset=0, ttl=64, protocol="tcp", dscp=0,
@@ -88,6 +90,7 @@ class IPv4:
         to properly formated bytes to be inserted into packet
         If self.payload is not TCP or UDP object, self.payload is converted to bytes with str.encode(self.payload) if
         possible. Otherwise, it is assumed payload is already bytes
+
         :return: bytes representation of IPv4 Packet
         :rtype: Bytes
         """
@@ -141,9 +144,10 @@ class IPv4:
     def parse_further_layers(self, recursive = True):
         """
         Method that parses higher layers
+
         :param recursive: Whether parsing function should be called recursively\
             through all layers, defaults to True
-        type recursive: Boolean
+        :type recursive: Boolean
         """
         if self.protocol == "udp":
             self.payload = UDP.udp_parser(self.payload, recursive)
@@ -159,6 +163,7 @@ class IPv4:
     def ipv4_parser(cls, data, recursive=True):
         """
         Class Method that parses group of bytes to create IPv4 Object
+
         :param recursive: boolean of whether to parse recursively to higher \
         layers, defaults to True \
         If protocol is "TCP", payload will be TCP object created \
@@ -218,6 +223,7 @@ class IPv4:
     def __str__(self):
         """
         Create string representation of IPv4 object
+
         :return: String of IPv4
         :rtype: String
         """

@@ -67,6 +67,7 @@ class ARP:
     def as_bytes(self):
         """
         Converts ARP to proper format of payload bytes
+
         :return: bytes representation of ARP message
         :rtype: bytes
         """
@@ -81,6 +82,7 @@ class ARP:
     def arp_parser(cls, data):
         """
         Class Method that parses group of bytes to create ARP object
+
         :param data: ARP message to parse passed in as bytes
         :type data: bytes
         :return: ARP instance that contains the values that was in data
@@ -101,6 +103,7 @@ class ARP:
     def __str__(self):
         """
         Gives string representation of ARP object
+
         :return: String representation of ARP object
         :rtype: String
         """

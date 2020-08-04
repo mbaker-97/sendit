@@ -34,6 +34,7 @@ class IPv6_Listener():
     def listen(self, queue):
         """
         Listen for frames coming in on queue to parse the IPv6 objects inside
+
         :param queue: Queue to listen in on
         :type queue: Queue object
         """

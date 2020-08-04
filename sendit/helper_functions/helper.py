@@ -25,6 +25,7 @@ def MAC_to_manufacturer(address):
     """
     Takes a MAC Address and searches through CSV files from IEEE to find 
     manufacturer they belong to
+
     :param address: MAC Address, bytes separated with colon (:)
     :type address: String
     :return: String of manufacturer of device with provided MAC Address \
@@ -64,6 +65,7 @@ def MAC_to_manufacturer(address):
 def manufacturer_to_MAC(manufacturer):
     """
     Provides a list of MAC prefixes based off provided manufacturer
+
     :param manufacturer: Name of manufacturer
     :type manufacturer: String
     :return: list of strings of 3 byte MAC prefixes registered to that \
@@ -83,6 +85,7 @@ def is_hex(string):
     """
     Determines if string consists solely of ascii characters that are \
         hexidecimal characters
+
     :param string: string to check if hex
     :type string: String
     :return: boolean representing if the string consists of only hex ascii \
@@ -97,6 +100,7 @@ def get_MAC(interface):
     Finds MAC address of a network interface on the host
     Uses Unix tools ifconfig and grep
     Not supported on all Operating Systems, or all kernels
+
     :param interface: string of the interface to look for
     :type interface: String
     :return: string representing MAC address of interface \
@@ -124,6 +128,7 @@ def get_ip(interface):
     Finds IP of a network interface on the host
     Uses UNIX tools ifconfig, grep, and awk
     Not supported on all Operating Systems or all kernels
+
     :param interface: string of the interface to look for
     :type interface: String
     :return: string representing MAC address of interface \
@@ -150,6 +155,7 @@ def addr_to_bytes(address):
     """
     Takes address represented in string consisting of hex characters, MAC or 
     IPv6, and converts to bytes
+
     :param address:  addrss to convert
     :type address: String
     :return: bytes form of address
@@ -161,6 +167,7 @@ def addr_to_bytes(address):
 def bytes_to_MAC(address):
     """
     Converts bytes form of MAC address to String form of MAC address
+
     :param address: Bytes form of MAC address
     :type address: bytes
     :return: String form of MAC Address
@@ -175,6 +182,7 @@ def is_valid_ipv4(address):
     """
     Determines if address if valid IPv4 address
     Checks that there are 4 octets, and values are between 0 and 255, inclusive
+
     :param address: value to check if valid IPv4 address
     :type address: String
     :return: boolean representing if address is a valid IPv4 address
@@ -202,6 +210,7 @@ def is_valid_MAC(address):
     """
     Determines if address if valid MAC address
     Checks that there are 12 characters, and all are Hex values
+
     :param address: value to check if valid MAC address
     :type address: String
     :return: boolean representing if address is a valid MAC address
@@ -223,6 +232,7 @@ def is_valid_MAC(address):
 def ip_to_int(address):
     """
     Converts string IP addrss to an int
+
     :param address: string IP address
     :type address: String
     :return: int representing IP address
@@ -242,6 +252,7 @@ def ip_to_int(address):
 def int_to_ip(number):
     """
     Converts int to string IPv4 address
+
     :param number: int to convert to string IPv4 address
     :type number: int
     :return: String of IPv4 address
@@ -262,6 +273,7 @@ def checksum(message):
     Calculates 16 bit checksum by 1's compliment addition between all 16 bit \
     words in message, and then taking the 1's compliment of the sum
     Formula same as defined for IPv4, TCP, and UDP
+
     :param message: takes header to create checksum
     :type message: bytes
     :return: 16 bit checksum
@@ -289,6 +301,7 @@ def checksum(message):
 def form_pseudo_header(src_ip, dst_ip, length, protocol, version=4):
     """
     Form TCP/UDP pseudoheader for checksum calculation
+
     :param src_ip: source ip
     :type src_ip: String
     :param dst_ip: destination ip

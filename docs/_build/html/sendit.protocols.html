@@ -1,0 +1,764 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sendit.protocols package &mdash; Sendit 1.0.5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="sendit.helper_functions package" href="sendit.helper_functions.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Sendit
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">sendit</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sendit.html">sendit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="sendit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="sendit.applications.html">sendit.applications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sendit.handlers.html">sendit.handlers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sendit.helper_functions.html">sendit.helper_functions package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">sendit.protocols package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sendit.html#module-sendit">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Sendit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">sendit</a> &raquo;</li>
+        
+          <li><a href="sendit.html">sendit package</a> &raquo;</li>
+        
+      <li>sendit.protocols package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sendit.protocols.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sendit-protocols-package">
+<h1>sendit.protocols package<a class="headerlink" href="#sendit-protocols-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sendit.protocols.arp">
+<span id="sendit-protocols-arp-module"></span><h2>sendit.protocols.arp module<a class="headerlink" href="#module-sendit.protocols.arp" title="Permalink to this headline">¶</a></h2>
+<p>Creates ARP  object and provides methods to parse bytes to ARP create bytes
+to ARP object</p>
+<dl class="py class">
+<dt id="sendit.protocols.arp.ARP">
+<em class="property">class </em><code class="sig-prename descclassname">sendit.protocols.arp.</code><code class="sig-name descname">ARP</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sha</span></em>, <em class="sig-param"><span class="n">spa</span></em>, <em class="sig-param"><span class="n">tha</span></em>, <em class="sig-param"><span class="n">tpa</span></em>, <em class="sig-param"><span class="n">hrd</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">pro</span><span class="o">=</span><span class="default_value">2048</span></em>, <em class="sig-param"><span class="n">hln</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">pln</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">op</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.arp.ARP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Holds all data for ARP</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sha</strong> (<em>String</em><em>, </em><em>formatted as &quot;XX:XX:XX:XX:XX:XX&quot;</em>) – Source MAC  address</p></li>
+<li><p><strong>spa</strong> (<em>String</em><em>, </em><em>formated as &quot;XXX.XXX.XXX.XXX&quot;</em>) – string of source IP address</p></li>
+<li><p><strong>tha</strong> (<em>String</em><em>, </em><em>formatted as &quot;XX:XX:XX:XX:XX:XX&quot;</em>) – string of target MAC address</p></li>
+<li><p><strong>tpa</strong> (<em>String</em><em>, </em><em>formated as &quot;XXX.XXX.XXX.XXX&quot;</em>) – string of target IP address”</p></li>
+<li><p><strong>hrd</strong> (<em>int</em>) – hardware code, defaults to 1 for ethernet</p></li>
+<li><p><strong>pro</strong> (<em>int</em>) – type of protocol address - corresponds to Ethertype values, defaults to 2048 for IPv4</p></li>
+<li><p><strong>hln</strong> (<em>int</em>) – length of hardware address in bytes, defaults to 6 for MAC length</p></li>
+<li><p><strong>pln</strong> (<em>int</em>) – length of protocol address in bytes, defaults to 4 for IPv4 length</p></li>
+<li><p><strong>op</strong> (<em>int</em>) – opcode of arp message, defaults to 1 for request</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if opcode, hrd, or  pln is not between 0 and 65535             inclusive or hln or pln is not between 0 and 255 inclusive</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sendit.protocols.arp.ARP.arp_parser">
+<em class="property">classmethod </em><code class="sig-name descname">arp_parser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.arp.ARP.arp_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class Method that parses group of bytes to create ARP object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>bytes</em>) – ARP message to parse passed in as bytes</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ARP instance that contains the values that was in data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ARP object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.arp.ARP.as_bytes">
+<code class="sig-name descname">as_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.arp.ARP.as_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts ARP to proper format of payload bytes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>bytes representation of ARP message</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sendit.protocols.etherframe">
+<span id="sendit-protocols-etherframe-module"></span><h2>sendit.protocols.etherframe module<a class="headerlink" href="#module-sendit.protocols.etherframe" title="Permalink to this headline">¶</a></h2>
+<p>Creates Etherframe object and provides methods to parse bytes to Etherframe 
+create bytes to EtherFrame object</p>
+<dl class="py class">
+<dt id="sendit.protocols.etherframe.EtherFrame">
+<em class="property">class </em><code class="sig-prename descclassname">sendit.protocols.etherframe.</code><code class="sig-name descname">EtherFrame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dst</span></em>, <em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">payload</span></em>, <em class="sig-param"><span class="n">ethertype</span><span class="o">=</span><span class="default_value">'ipv4'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.etherframe.EtherFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Holds all data of Etherframe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dst</strong> (<em>String</em>) – string of destination MAC address ex: “AB:CD:EF:01:23:45”</p></li>
+<li><p><strong>src</strong> (<em>String</em>) – string of source MAC Address ex: “AB:CD:EF:01:23:45”</p></li>
+<li><p><strong>payload</strong> (<a class="reference internal" href="#sendit.protocols.arp.ARP" title="sendit.protocols.arp.ARP"><em>ARP</em></a><em>, </em><a class="reference internal" href="#sendit.protocols.ipv4.IPv4" title="sendit.protocols.ipv4.IPv4"><em>IPv4</em></a><em>, </em><a class="reference internal" href="#sendit.protocols.ipv6.IPv6" title="sendit.protocols.ipv6.IPv6"><em>IPv6</em></a><em>, or </em><em>any</em><em> or </em><em>any object str.encode</em><em>(</em><em>payload</em><em>) </em><em>can be called</em>) – data to put into Etherframe</p></li>
+<li><p><strong>ethertype</strong> (<em>String</em>) – String representing ethertype - defaults to “ipv4”. Can         be ipv4, ipv6, arp, or rarp,  or a custom value consisting of 4 hex         string ascii chars, such as “8035”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if dst not valid MAC address, if src not valid MAC         address, or ethertype not supported builtin AND is not 2 bytes of a         string of hex characters</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sendit.protocols.etherframe.EtherFrame.as_bytes">
+<code class="sig-name descname">as_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.etherframe.EtherFrame.as_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts EtherFrame to proper format of payload bytes to send on Raw_NIC
+If self.payload is IPv4 or ARP object, their as_bytes function is called, providing the conversion of payload
+to properly formated bytes to be inserted into frame to be sent on Raw_NIC
+If self.payload is not IPv4 or ARP object, self.payload is conver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>bytes representation of EtherFrame</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sendit.protocols.etherframe.EtherFrame.bytes_to_ethertype">
+<code class="sig-name descname">bytes_to_ethertype</code><em class="property"> = {b'\x08\x00': 'ipv4', b'\x08\x06': 'arp', b'\x805': 'rarp', b'\x86\xdd': 'ipv6'}</em><a class="headerlink" href="#sendit.protocols.etherframe.EtherFrame.bytes_to_ethertype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.etherframe.EtherFrame.etherframe_parser">
+<em class="property">classmethod </em><code class="sig-name descname">etherframe_parser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.etherframe.EtherFrame.etherframe_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class Method that parses group of bytes to create EtherFrame Object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="#sendit.protocols.etherframe.EtherFrame" title="sendit.protocols.etherframe.EtherFrame"><em>EtherFrame</em></a>) – etherframe passed in as bytes             If IPv4 is type of frame, payload will be IPv4 object created             If ARP is type of frame, payload will be ARP object created</p></li>
+<li><p><strong>recursive</strong> – boolean of whether to parse recursively to higher             layers, defaults to True         If protocol is “IPv4”, payload will be IPv4 object created         If protocol is “IPv6”, payload will be IPv6 object created         If protocol is “ARP”, payload will be ARP object created         :type recursive: Boolean</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>EtherFrame instance that contains the values that was in data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#sendit.protocols.etherframe.EtherFrame" title="sendit.protocols.etherframe.EtherFrame">EtherFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sendit.protocols.etherframe.EtherFrame.ethertype_to_bytes">
+<code class="sig-name descname">ethertype_to_bytes</code><em class="property"> = {'arp': b'\x08\x06', 'ipv4': b'\x08\x00', 'ipv6': b'\x86\xdd', 'rarp': b'\x805'}</em><a class="headerlink" href="#sendit.protocols.etherframe.EtherFrame.ethertype_to_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.etherframe.EtherFrame.parse_further_layers">
+<code class="sig-name descname">parse_further_layers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.etherframe.EtherFrame.parse_further_layers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that parses higher layer information contained in payload</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>recursive</strong> (<em>boolean</em>) – boolean value of whether parsing function should             be called recursively through all layers</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Object representation of payload if possible to parse, if not                 returns self.payload</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#sendit.protocols.arp.ARP" title="sendit.protocols.arp.ARP">ARP</a>, <a class="reference internal" href="#sendit.protocols.ipv4.IPv4" title="sendit.protocols.ipv4.IPv4">IPv4</a>, <a class="reference internal" href="#sendit.protocols.ipv6.IPv6" title="sendit.protocols.ipv6.IPv6">IPv6</a>, or bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sendit.protocols.ipv4">
+<span id="sendit-protocols-ipv4-module"></span><h2>sendit.protocols.ipv4 module<a class="headerlink" href="#module-sendit.protocols.ipv4" title="Permalink to this headline">¶</a></h2>
+<p>Creates IPv4 object and provides methods to parse bytes to IPv4 create bytes
+to IPv4 object</p>
+<dl class="py class">
+<dt id="sendit.protocols.ipv4.IPv4">
+<em class="property">class </em><code class="sig-prename descclassname">sendit.protocols.ipv4.</code><code class="sig-name descname">IPv4</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">dst</span></em>, <em class="sig-param"><span class="n">payload</span></em>, <em class="sig-param"><span class="n">id</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">length</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">df</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">mf</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">offset</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ttl</span><span class="o">=</span><span class="default_value">64</span></em>, <em class="sig-param"><span class="n">protocol</span><span class="o">=</span><span class="default_value">'tcp'</span></em>, <em class="sig-param"><span class="n">dscp</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ecn</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">version</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">checksum</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.ipv4.IPv4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Creates IPv4 object from parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<em>String</em>) – source IP address</p></li>
+<li><p><strong>dst</strong> (<em>String</em>) – destination IP address</p></li>
+<li><p><strong>payload</strong> (<a class="reference internal" href="#sendit.protocols.tcp.TCP" title="sendit.protocols.tcp.TCP"><em>TCP</em></a><em> or </em><em>UDP objects of String</em>) – payload of the packet</p></li>
+<li><p><strong>id</strong> (<em>int</em>) – identification number of packet, defaults to 0</p></li>
+<li><p><strong>length</strong> (<em>int</em>) – total  length of IP packet in bytes - header + data together,         defaults to 0, calculated when as_bytes called. If IPv4 object created         from parser function, takes value of captured IPv4 packet, and NOT         calculated in as_bytes unless reset to 0 manually with         reset_calculated_fields</p></li>
+<li><p><strong>df</strong> (<em>Boolean</em>) – do not fragment flag, default to False</p></li>
+<li><p><strong>mf</strong> (<em>Boolean</em>) – more fragments flag - deafult to False</p></li>
+<li><p><strong>offset</strong> (<em>int</em>) – frag offset of packet, default to 0</p></li>
+<li><p><strong>ttl</strong> (<em>int</em>) – time to live, default to 64</p></li>
+<li><p><strong>protocol</strong> (<em>String</em><em> or </em><em>int</em>) – string name of protocol carried in packet.currently         supported values: “tcp”, “udp”, “icmp”, custom int value accepted IF         valid</p></li>
+<li><p><strong>dscp</strong> (<em>int</em>) – differentiated services value - default of 0</p></li>
+<li><p><strong>ecn</strong> (<em>int</em>) – explicit congestion notification - default of 0</p></li>
+<li><p><strong>version</strong> (<em>int</em>) – version of IP</p></li>
+<li><p><strong>checksum</strong> (<em>int</em>) – checksum of packet. By default, not calculated and set to         0 and to be calculated when as_bytes called. Set when IPv4 object         created from parser function, and unless reset manually or with         reset_calculated_fields function, will NOT be recalculated when         as_bytes is called</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sendit.protocols.ipv4.IPv4.as_bytes">
+<code class="sig-name descname">as_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.ipv4.IPv4.as_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts IPv4 to proper format of payload bytes to send set as EtherFrame payload
+If self.payload is TCP or UDP object, their as_bytes function is called, providing the conversion of payload
+to properly formated bytes to be inserted into packet
+If self.payload is not TCP or UDP object, self.payload is converted to bytes with str.encode(self.payload) if
+possible. Otherwise, it is assumed payload is already bytes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>bytes representation of IPv4 Packet</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.ipv4.IPv4.ipv4_parser">
+<em class="property">classmethod </em><code class="sig-name descname">ipv4_parser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.ipv4.IPv4.ipv4_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class Method that parses group of bytes to create IPv4 Object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>recursive</strong> – boolean of whether to parse recursively to higher         layers, defaults to True         If protocol is “TCP”, payload will be TCP object created         If protocol is “UDP”, payload will be UDP object created         :type recursive: Boolean</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>IPv4 instance that contains the values that was in data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>IPv4 object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.ipv4.IPv4.parse_further_layers">
+<code class="sig-name descname">parse_further_layers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.ipv4.IPv4.parse_further_layers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that parses higher layers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>recursive</strong> (<em>Boolean</em>) – Whether parsing function should be called recursively            through all layers, defaults to True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.ipv4.IPv4.reset_calculated_fields">
+<code class="sig-name descname">reset_calculated_fields</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.ipv4.IPv4.reset_calculated_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets calculated fields for IPv4 - resets length and checksum</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sendit.protocols.ipv6">
+<span id="sendit-protocols-ipv6-module"></span><h2>sendit.protocols.ipv6 module<a class="headerlink" href="#module-sendit.protocols.ipv6" title="Permalink to this headline">¶</a></h2>
+<p>Creates IPv6 object and provides methods to parse bytes to IPv6 and create 
+bytes to IPv6 object</p>
+<dl class="py class">
+<dt id="sendit.protocols.ipv6.IPv6">
+<em class="property">class </em><code class="sig-prename descclassname">sendit.protocols.ipv6.</code><code class="sig-name descname">IPv6</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">dst</span></em>, <em class="sig-param"><span class="n">payload</span></em>, <em class="sig-param"><span class="n">next</span><span class="o">=</span><span class="default_value">'tcp'</span></em>, <em class="sig-param"><span class="n">limit</span><span class="o">=</span><span class="default_value">64</span></em>, <em class="sig-param"><span class="n">flow_label</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ds</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ecn</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">version</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">length</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.ipv6.IPv6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Creates IPv6 object from parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<em>String</em>) – source IPv6 address</p></li>
+<li><p><strong>dst</strong> (<em>String</em>) – destination IPv6 address</p></li>
+<li><p><strong>payload</strong> (<a class="reference internal" href="#sendit.protocols.tcp.TCP" title="sendit.protocols.tcp.TCP"><em>TCP</em></a><em> or </em><em>UDP object</em><em>, or </em><em>String</em>) – payload to be encapsulated inside IPv6 packet</p></li>
+<li><p><strong>next</strong> (<em>String</em>) – next header protocol,  defaults to “tcp”. “udp” and “icmp”         also supported</p></li>
+<li><p><strong>limit</strong> (<em>int</em>) – hop count limit - 0 to 255 inclusive</p></li>
+<li><p><strong>flow_label</strong> (<em>int</em>) – label for which flow packet belongs to, defaults to 0 -         which is not flow</p></li>
+<li><p><strong>ds</strong> (<em>int</em>) – Differentiated Services field, defaults to 0</p></li>
+<li><p><strong>ecn</strong> (<em>int</em>) – Explicit Congestion Notification value, defaults to 0</p></li>
+<li><p><strong>version</strong> (<em>int</em>) – IP version, defaults to 6</p></li>
+<li><p><strong>length</strong> (<em>int</em>) – length of IPv6 packet, defaults to 0 and calculated in         as_bytes function. If IPv6 object created with parser method, will         take value of IPv6 packet captured, and will NOT be calculated in         as_bytes unless reset manually to 0 or with reset_calculated_fields        function</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sendit.protocols.ipv6.IPv6.as_bytes">
+<code class="sig-name descname">as_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.ipv6.IPv6.as_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts IPv6 to proper format of payload bytes to send set as EtherFrame payload
+If self.payload is TCP or UDP object, their as_bytes function is called, providing the conversion of payload
+to properly formated bytes to be inserted into packet
+If self.payload is not TCP or UDP object, self.payload is converted to bytes with str.encode(self.payload)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>bytes representation of IPv6 Packet</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.ipv6.IPv6.ipv6_parser">
+<em class="property">classmethod </em><code class="sig-name descname">ipv6_parser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.ipv6.IPv6.ipv6_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class Method that parses group of bytes to create IPv6 Object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>bytes</em>) – IPv6 packet passed in as bytes</p></li>
+<li><p><strong>recursive</strong> (<em>Boolean</em>) – Boolean of whether to recursively parse; if true and             if protocol is “TCP”, payload will be TCP object created             if protocol is “UDP”, payload will be UDP object created</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>IPv6 instance that contains the values that was in data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#sendit.protocols.ipv6.IPv6" title="sendit.protocols.ipv6.IPv6">IPv6</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.ipv6.IPv6.parse_further_layers">
+<code class="sig-name descname">parse_further_layers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.ipv6.IPv6.parse_further_layers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that parses higher layers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>recursive</strong> – boolean value of whether parsing funciton should         be called recursively through all layers</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.ipv6.IPv6.reset_calculated_fields">
+<code class="sig-name descname">reset_calculated_fields</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.ipv6.IPv6.reset_calculated_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets all calulated fields for IPv6 - resets length</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sendit.protocols.tcp">
+<span id="sendit-protocols-tcp-module"></span><h2>sendit.protocols.tcp module<a class="headerlink" href="#module-sendit.protocols.tcp" title="Permalink to this headline">¶</a></h2>
+<p>Creates TCP object and provides methods to parse bytes to TCP create bytes
+to TCP object</p>
+<dl class="py class">
+<dt id="sendit.protocols.tcp.TCP">
+<em class="property">class </em><code class="sig-prename descclassname">sendit.protocols.tcp.</code><code class="sig-name descname">TCP</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src_prt</span></em>, <em class="sig-param"><span class="n">dst_prt</span></em>, <em class="sig-param"><span class="n">src_ip</span></em>, <em class="sig-param"><span class="n">dst_ip</span></em>, <em class="sig-param"><span class="n">window</span></em>, <em class="sig-param"><span class="n">payload</span></em>, <em class="sig-param"><span class="n">sqn</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ack_num</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ns</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">cwr</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ece</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">urg</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ack</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">psh</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rst</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">syn</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">fin</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">urg_pnt</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">version</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">mss</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scaling</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sack_permitted</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stamp</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sack</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">offset</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">checksum</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.tcp.TCP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Forms TCP Object from parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_prt</strong> (<em>int</em>) – source TCP port</p></li>
+<li><p><strong>dst_prt</strong> (<em>int</em>) – destination TCP port</p></li>
+<li><p><strong>src_ip</strong> (<em>String</em>) – source IP address - used for creating pseudoheader to calculate checksum</p></li>
+<li><p><strong>dst_ip</strong> (<em>String</em>) – destination IP address - used for creating pseudoheader to         calculate checksum</p></li>
+<li><p><strong>window</strong> (<em>int</em>) – window size</p></li>
+<li><p><strong>payload</strong> (<em>String</em>) – payload of TCP Segment</p></li>
+<li><p><strong>sqn</strong> (<em>int</em>) – sequence Number</p></li>
+<li><p><strong>ack_num</strong> (<em>int</em>) – Acknowledgement Number</p></li>
+<li><p><strong>offset</strong> (<em>int</em>) – 4 byte word offset of where data starts, defaults to 5</p></li>
+<li><p><strong>ns</strong> (<em>boolean</em>) – ns flag, defaults to False</p></li>
+<li><p><strong>cwr</strong> (<em>boolean</em>) – cwr flag, defaults to False</p></li>
+<li><p><strong>ece</strong> (<em>boolean</em>) – ece flag, defaults to False</p></li>
+<li><p><strong>urg</strong> (<em>boolean</em>) – urg flag, defaults to False</p></li>
+<li><p><strong>ack</strong> (<em>boolean</em>) – ack flag, defaults to False</p></li>
+<li><p><strong>psh</strong> (<em>boolean</em>) – psh flag, defaults to False</p></li>
+<li><p><strong>rst</strong> (<em>boolean</em>) – rst flag, defaults to False</p></li>
+<li><p><strong>syn</strong> (<em>boolean</em>) – syn flag, defaults to False</p></li>
+<li><p><strong>fin</strong> (<em>boolean</em>) – fin flag, defaults to False</p></li>
+<li><p><strong>urg_pnt</strong> (<em>int</em>) – offset of where urgent data stops</p></li>
+<li><p><strong>mss</strong> (<em>int</em>) – maximum segment size TCP option</p></li>
+<li><p><strong>scaling</strong> (<em>int</em>) – window scaling factor TCP option</p></li>
+<li><p><strong>sack_permitted</strong> (<em>boolean</em>) – boolean value of whether selective acknowledgments         allowed - TCP option</p></li>
+<li><p><strong>sack</strong> (<em>tuple of ints</em>) – tuple containing byte numbers, in order, to be passes as         selective acknowledgments TCP option</p></li>
+<li><p><strong>stamp</strong> (<em>tuple of ints</em>) – tuple containing timestamp value and time stamp error</p></li>
+<li><p><strong>checksum</strong> (<em>int</em>) – default set to 0 and calculated when as_bytes called if 0         If TCP object created from parser function, set to checksum of         captured segment and NOT recalculated in as_bytes unless set to 0         manually or by calling reset_calculated_fields function</p></li>
+</ul>
+</dd>
+</dl>
+<p>:raise ValueError when src_prt or dst_prt  not between 0 and 6553         inclusive         or when sqn not between 0 and 4294967295 inclusive         or  when ack_number not between 0 and 4294967295 inclusive         or when window not between 0 and 4294967295 inclusive         or when urg_pnt not between 0 and 4294967295 inclusive         or when length of sack greater than 8         or when sack contains odd number of values</p>
+<dl class="py method">
+<dt id="sendit.protocols.tcp.TCP.as_bytes">
+<code class="sig-name descname">as_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.tcp.TCP.as_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts TCP to proper format of payload bytes to send
+self.payload is converted to bytes with str.encode(self.payload)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>bytes representation of TCP</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.tcp.TCP.create_tcp_options">
+<code class="sig-name descname">create_tcp_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.tcp.TCP.create_tcp_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set TCP Header options
+mss, sack_permitted, and scaling only used during syn and ack of handshake
+sack (selective acknowledgment) value cannot be set during handhake
+Header option combinations are:
+mss, sack_permitted, scaling, and stamp (timestamp) during handshake - any combination of these 4
+timestamp and selective acknowledgement value during regular transmissions - any combination of these 2
+Depending on what combination of these are set depends on what order they are arranged in, along with
+nop (No-op) bytes to fit in 32 bit word</p>
+<p>TODO handle sack value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>tuple consisting of bytes of options for this TCP segment and increase to options header</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple of bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.tcp.TCP.parse_further_layers">
+<code class="sig-name descname">parse_further_layers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.tcp.TCP.parse_further_layers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that parses higher layers and sets the payload of calling TCP
+object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>recursive</strong> (<em>true</em>) – boolean value of whether parsing function should             be called recursively through all layers</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.tcp.TCP.parse_options">
+<code class="sig-name descname">parse_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">option_bytes</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.tcp.TCP.parse_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses TCP header options from a series of byte</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>option_bytes</strong> (<em>bytes</em>) – series of bytes containing TCP Header options</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of options to return containing [MSS, Window Scale,                 sack_permitted, sack_values, timestamp]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.tcp.TCP.reset_calculated_fields">
+<code class="sig-name descname">reset_calculated_fields</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.tcp.TCP.reset_calculated_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets calculated fields for TCP - resets checksum and length</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.tcp.TCP.tcp_parser">
+<em class="property">classmethod </em><code class="sig-name descname">tcp_parser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.tcp.TCP.tcp_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class method that creates TCP object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> – TCP segment passed in as bytes</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TCP object created from values in data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#sendit.protocols.tcp.TCP" title="sendit.protocols.tcp.TCP">TCP</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sendit.protocols.udp">
+<span id="sendit-protocols-udp-module"></span><h2>sendit.protocols.udp module<a class="headerlink" href="#module-sendit.protocols.udp" title="Permalink to this headline">¶</a></h2>
+<p>Creates UDP object and provides methods to parse bytes to UDP create bytes
+to UDP object</p>
+<dl class="py class">
+<dt id="sendit.protocols.udp.UDP">
+<em class="property">class </em><code class="sig-prename descclassname">sendit.protocols.udp.</code><code class="sig-name descname">UDP</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src_prt</span></em>, <em class="sig-param"><span class="n">dst_prt</span></em>, <em class="sig-param"><span class="n">src_ip</span></em>, <em class="sig-param"><span class="n">dst_ip</span></em>, <em class="sig-param"><span class="n">payload</span></em>, <em class="sig-param"><span class="n">version</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">length</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">checksum</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.udp.UDP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Creates UDP object from parameters
+UDP checksum is optional and therefore not currently supported</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src_prt</strong> (<em>int</em>) – source port</p></li>
+<li><p><strong>dst_prt</strong> (<em>int</em>) – destination port</p></li>
+<li><p><strong>src_ip</strong> (<em>String</em>) – source IP address - used for creating pseudoheader to         calculate checksum</p></li>
+<li><p><strong>dst_ip</strong> (<em>String</em>) – destination IP address - used for creating pseudoheader to         calculate checksum</p></li>
+<li><p><strong>version</strong> – version of IP being carried in - used for calculating         checksum</p></li>
+<li><p><strong>length</strong> (<em>int</em>) – length of segment, defaults to 0, calculated when as_bytes         called if 0. If UDP object created from parser function, set to         length of captured segment and NOT recalculated in as_bytes unless         set to 0 manually or by calling reset_calculated_fields function</p></li>
+<li><p><strong>checksum</strong> (<em>int</em>) – default set to 0 and calculated when as_bytes called if 0         If UDP object created from parser function, set to checksum of         captured segment and NOT recalculated in as_bytes unless set to 0         manually or by calling reset_calculated_fields function</p></li>
+<li><p><strong>payload</strong> (<em>bytes</em>) – payload to be carried UDP</p></li>
+</ul>
+</dd>
+<dt class="field-even">Version type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – if src_prt or dst_prt is between 0 and 65535 inclusive</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sendit.protocols.udp.UDP.as_bytes">
+<code class="sig-name descname">as_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.udp.UDP.as_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts UDP to proper format of payload bytes to send
+self.payload is converted to bytes with str.encode(self.payload)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>bytes representation of UDP</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.udp.UDP.parse_further_layers">
+<code class="sig-name descname">parse_further_layers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.udp.UDP.parse_further_layers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that parses higher layers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>recursive</strong> (<em>boolean</em>) – boolean value of whether parsing function should be             called through higher layers, defaults to True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.udp.UDP.reset_calculated_fields">
+<code class="sig-name descname">reset_calculated_fields</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.udp.UDP.reset_calculated_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets calcualted fields for UDP - resets checksum and length</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.protocols.udp.UDP.udp_parser">
+<em class="property">classmethod </em><code class="sig-name descname">udp_parser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.protocols.udp.UDP.udp_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class method that creates UDP object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>bytes</em>) – UDP segment passed in as bytes</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>UDP object created from values in data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#sendit.protocols.udp.UDP" title="sendit.protocols.udp.UDP">UDP</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sendit.protocols">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sendit.protocols" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="sendit.helper_functions.html" class="btn btn-neutral float-left" title="sendit.helper_functions package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Matt Baker
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

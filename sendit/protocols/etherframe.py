@@ -60,6 +60,7 @@ class EtherFrame:
         If self.payload is IPv4 or ARP object, their as_bytes function is called, providing the conversion of payload
         to properly formated bytes to be inserted into frame to be sent on Raw_NIC
         If self.payload is not IPv4 or ARP object, self.payload is conver
+
         :return: bytes representation of EtherFrame
         :rtype: bytes
         """
@@ -90,6 +91,7 @@ class EtherFrame:
     def parse_further_layers(self, recursive=True):
         """
         Method that parses higher layer information contained in payload
+
         :param recursive:  boolean value of whether parsing function should \
             be called recursively through all layers
         :type recursive: boolean
@@ -112,6 +114,7 @@ class EtherFrame:
     def etherframe_parser(cls, data, recursive=True):
         """
         Class Method that parses group of bytes to create EtherFrame Object
+
         :param data: etherframe passed in as bytes \
             If IPv4 is type of frame, payload will be IPv4 object created \
             If ARP is type of frame, payload will be ARP object created
@@ -146,6 +149,7 @@ class EtherFrame:
     def __str__(self):
         """
         Create string representation of EtherFrame
+
         :return: String representation of EtherFrame
         :rtype: String
         """

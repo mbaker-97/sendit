@@ -15,6 +15,7 @@ from sendit.helper_functions.helper import *
 class IPv6:
     """
     Creates IPv6 object from parameters
+
     :param src: source IPv6 address
     :type src: String
     :param dst: destination IPv6 address
@@ -22,12 +23,12 @@ class IPv6:
     :param payload: payload to be encapsulated inside IPv6 packet
     :type payload: TCP or UDP object, or String
     :param next: next header protocol,  defaults to "tcp". "udp" and "icmp" \
-            also supported
+        also supported
     :type next: String
     :param limit: hop count limit - 0 to 255 inclusive
     :type limit: int
     :param flow_label: label for which flow packet belongs to, defaults to 0 - \
-            which is not flow
+        which is not flow
     :type flow_label: int
     :param ds: Differentiated Services field, defaults to 0
     :type ds: int
@@ -36,10 +37,10 @@ class IPv6:
     :param version: IP version, defaults to 6
     :type version: int
     :param length: length of IPv6 packet, defaults to 0 and calculated in \
-            as_bytes function. If IPv6 object created with parser method, will \
-            take value of IPv6 packet captured, and will NOT be calculated in \
-            as_bytes unless reset manually to 0 or with reset_calculated_fields\
-            function
+        as_bytes function. If IPv6 object created with parser method, will \
+        take value of IPv6 packet captured, and will NOT be calculated in \
+        as_bytes unless reset manually to 0 or with reset_calculated_fields\
+        function
     :type length: int
     """
     
@@ -82,6 +83,7 @@ class IPv6:
         If self.payload is TCP or UDP object, their as_bytes function is called, providing the conversion of payload
         to properly formated bytes to be inserted into packet
         If self.payload is not TCP or UDP object, self.payload is converted to bytes with str.encode(self.payload)
+
         :return: bytes representation of IPv6 Packet
         :rtype: bytes
         """
@@ -125,10 +127,13 @@ class IPv6:
     def ipv6_parser(cls, data, recursive=True):
         """
         Class Method that parses group of bytes to create IPv6 Object
+
         :param data: IPv6 packet passed in as bytes
         :type data: bytes
-        If protocol is "TCP", payload will be TCP object created
-        If protocol is "UDP", payload will be UDP object created
+        :param recursive: Boolean of whether to recursively parse; if true and \
+            if protocol is "TCP", payload will be TCP object created \
+            if protocol is "UDP", payload will be UDP object created
+        :type recursive: Boolean
         :return: IPv6 instance that contains the values that was in data
         :rtype: IPv6 
         """
@@ -161,9 +166,10 @@ class IPv6:
     def parse_further_layers(self, recursive=True):
         """
         Method that parses higher layers
-        :param recursive: boolean value of whether parsing funciton should
-        :type return: Boolean
+
+        :param recursive: boolean value of whether parsing funciton should \
         be called recursively through all layers
+        :type return: Boolean
         """
 
         if self.next == "udp":
@@ -179,6 +185,7 @@ class IPv6:
     def __str__(self):
         """
         Create string representation of IPv6 object
+
         :return: String representation
         :rtype: String
         """
