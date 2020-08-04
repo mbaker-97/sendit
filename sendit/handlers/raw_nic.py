@@ -42,42 +42,6 @@ class Raw_NIC(socket):
 
         super().send(payload_bytes)
 
-#TODO
-class Async_Raw_NIC(socket):
-    """
-    Child Class of Socket
-    Creates Asynchronous Raw Socket, binds to provided interface
-    Implements send method that works with rest of library
-    Works similiarly to Raw_NIC, but can be used asynchronously
-    :param interface: string name of network interface \
-        ex: eth0, wlan0. Not sure? Call ifconfig and look at interface names
-    :type interface: String
-    """
-
-    def __init__(self, interface):
-        """Inits Raw_NIC as raw Socket bound to interface"""
-        super().__init__(AF_PACKET, SOCK_RAW, htons(3))
-        super().bind((interface, 0))
-        # Add for async:
-        super.setblocking(False)
-
-    def send(self, frame):
-        """
-        Overrides Socket send method
-        Attempts to use as_bytes() method that is provided by all protocol classes in this library
-        If not a class in this libary, calls str.encode on provided frame
-        Them sends on raw socket
-        :param frame: frame to send on Raw_NIC
-        :type frame: L2 object that has as_bytes function, such as Etherframe
-        """
-
-        try:
-            payload_bytes = frame.as_bytes()
-        except AttributeError:
-            payload_bytes = str.encode(frame)
-
-        super().send(payload_bytes)
-
 
 #  TODO rewrite send async
 class Async_Raw_NIC(socket):
@@ -95,6 +59,8 @@ class Async_Raw_NIC(socket):
         """Inits Raw_NIC as raw Socket bound to interface"""
         super().__init__(AF_PACKET, SOCK_RAW, htons(3))
         super().bind((interface, 0))
+        # Add for async:
+        super.setblocking(False)
 
     def send(self, frame, n_bytes):
         """
@@ -125,7 +91,7 @@ class Async_Raw_NIC(socket):
 
         while True:
             byte = await loop.sock_recv(this, n_bytes)
-            if queues not None:
+            if queues is not None:
                 for queue in queues:
                     await queue.put(byte)
 
