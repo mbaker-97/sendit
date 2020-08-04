@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -23,10 +23,13 @@ int_to_protocol = {1: "icmp", 6: "tcp", 17: "udp", 58:"icmpv6"}
 # Brute Force search .... sort csv and FIX!
 def MAC_to_manufacturer(address):
     """
-    Takes a MAC Address and searches through CSV files from IEEE to find manufacturer they belong to
-    :param address: MAC Address in string format, bytes separated with colon (:)
-    :return: String of manufacturer of device with provided MAC Address
-             "Unknown" if not found
+    Takes a MAC Address and searches through CSV files from IEEE to find 
+    manufacturer they belong to
+    :param address: MAC Address, bytes separated with colon (:)
+    :type address: String
+    :return: String of manufacturer of device with provided MAC Address \
+        Unknown if not found
+    :rtype: String
     """
     path = str(pathlib.Path(__file__).parent.absolute())
     addr = "".join(address.split(":")).upper()
@@ -35,7 +38,8 @@ def MAC_to_manufacturer(address):
         reader = csv.DictReader(mal)
         for row in reader:
             if row['Assignment'] == addr[:6]:
-                # Exists in other csvs - handed out in smaller blocks of addresses
+                # Exists in other csvs - handed out in smaller blocks of 
+                #  addresses
                 if row['Organization Name'] == "IEEE Registration Authority":
                     break
                 return row['Organization Name']
@@ -60,8 +64,11 @@ def MAC_to_manufacturer(address):
 def manufacturer_to_MAC(manufacturer):
     """
     Provides a list of MAC prefixes based off provided manufacturer
-    :param manufacturer: string of manufacturer name
-    :return: list of strings of 3 byte MAC prefixes registered to that manufacturer
+    :param manufacturer: Name of manufacturer
+    :type manufacturer: String
+    :return: list of strings of 3 byte MAC prefixes registered to that \
+        manufacturer
+    :rtype: list of Strings
     """
     macs = list()
     with open(path + '/mal.csv', newline='') as mal:
@@ -74,9 +81,13 @@ def manufacturer_to_MAC(manufacturer):
 
 def is_hex(string):
     """
-    Determines if string consists solely of ascii characters that are hexidecimal characters
+    Determines if string consists solely of ascii characters that are \
+        hexidecimal characters
     :param string: string to check if hex
-    :return: boolean representing if the string consists of only hex ascii characters
+    :type string: String
+    :return: boolean representing if the string consists of only hex ascii \
+        characters
+    :rtype: Boolean
     """
     return all(c in 'abcdef0123456789' for c in string.lower())
 
@@ -87,8 +98,11 @@ def get_MAC(interface):
     Uses Unix tools ifconfig and grep
     Not supported on all Operating Systems, or all kernels
     :param interface: string of the interface to look for
-    :return: string representing MAC address of interface
-             if OS does not support commands or interface not found, program exits with code 1
+    :type interface: String
+    :return: string representing MAC address of interface \
+    if OS does not support commands or interface not found, program \
+    exits with code 1
+    :rtype: String
     """
     try:
         val = subprocess.check_output("ifconfig " + interface + " | grep -Eo ..\\(\\:..\\){5}", shell=True,
@@ -111,8 +125,10 @@ def get_ip(interface):
     Uses UNIX tools ifconfig, grep, and awk
     Not supported on all Operating Systems or all kernels
     :param interface: string of the interface to look for
-    :return: string representing MAC address of interface
-             if OS does not support commands or interface not found, program exits with code 1
+    :type interface: String
+    :return: string representing MAC address of interface \
+    if OS does not support commands or interface not found, program exits with code 1
+    :rtype: String
     """
     try:
         val = subprocess.check_output("ifconfig " + interface + " | grep -w inet | awk '{ print $2}'", shell=True,
@@ -132,9 +148,12 @@ def get_ip(interface):
 # Works with MAC and IPv6
 def addr_to_bytes(address):
     """
-    Takes address represented in string consisting of hex characters, MAC or IPv6, and converts to bytes
+    Takes address represented in string consisting of hex characters, MAC or 
+    IPv6, and converts to bytes
     :param address:  addrss to convert
+    :type address: String
     :return: bytes form of address
+    :rtype: bytes
     """
     return bytes.fromhex(address.replace(':', '').replace('.', '').replace('-', ''))
 
@@ -143,7 +162,9 @@ def bytes_to_MAC(address):
     """
     Converts bytes form of MAC address to String form of MAC address
     :param address: Bytes form of MAC address
+    :type address: bytes
     :return: String form of MAC Address
+    :rtype: String
     """
     addr = address.hex()
     return (addr[0:2] + ":" + addr[2:4] + ":" + addr[4:6] + ":" + addr[6:8] + ":" + addr[8:10] + ":" + addr[
@@ -155,7 +176,9 @@ def is_valid_ipv4(address):
     Determines if address if valid IPv4 address
     Checks that there are 4 octets, and values are between 0 and 255, inclusive
     :param address: value to check if valid IPv4 address
+    :type address: String
     :return: boolean representing if address is a valid IPv4 address
+    :rtype: Boolean
     """
     #   Finds when non numeric values input
     try:
@@ -180,7 +203,9 @@ def is_valid_MAC(address):
     Determines if address if valid MAC address
     Checks that there are 12 characters, and all are Hex values
     :param address: value to check if valid MAC address
+    :type address: String
     :return: boolean representing if address is a valid MAC address
+    :rtype: Boolean
     """
     hexed = "".join([addr for addr in re.split(r'[.:-]', address)])
 
@@ -199,8 +224,10 @@ def ip_to_int(address):
     """
     Converts string IP addrss to an int
     :param address: string IP address
-    :raise ValueError if address is not  valid IPv4 addrss
+    :type address: String
     :return: int representing IP address
+    :rtype: int
+    :raise ValueError: if address is not  valid IPv4 addrss
     """
     if not is_valid_ipv4(address):
         raise ValueError("address must be valid IPv4 address")
@@ -216,7 +243,9 @@ def int_to_ip(number):
     """
     Converts int to string IPv4 address
     :param number: int to convert to string IPv4 address
+    :type number: int
     :return: String of IPv4 address
+    :rtype: String
     """
     if number > 4294967295 or number < 0:
         raise ValueError
@@ -230,11 +259,13 @@ def int_to_ip(number):
 
 def checksum(message):
     """
-    Calculates 16 bit checksum by 1's compliment addition between all 16 bit words in message,
-    and then taking the 1's compliment of the sum
+    Calculates 16 bit checksum by 1's compliment addition between all 16 bit \
+    words in message, and then taking the 1's compliment of the sum
     Formula same as defined for IPv4, TCP, and UDP
     :param message: takes header to create checksum
+    :type message: bytes
     :return: 16 bit checksum
+    :rtype: int
     """
     # Split message into 16 bit words
     words = [message[i:i + 2] for i in range(0, len(message), 2)]
@@ -258,12 +289,18 @@ def checksum(message):
 def form_pseudo_header(src_ip, dst_ip, length, protocol, version=4):
     """
     Form TCP/UDP pseudoheader for checksum calculation
-    :param version: IP version - default is 4
-    :param protocol: L4 Protocol - currently only support tcp and udp
     :param src_ip: source ip
+    :type src_ip: String
     :param dst_ip: destination ip
+    :type dst_ip: String
     :param length: length of tcp segment, header included
+    :type length: int
+    :param protocol: L4 Protocol - currently only support tcp and udp
+    :type protocol: String
+    :param version: IP version, defaults to 4
+    :type version: int
     :return: pseudoheader in bytes
+    :rtype: bytes
     """
     ip_protocol = protocols_to_int.get(protocol.lower())
     if version == 4:
