@@ -2,11 +2,10 @@
 Provides easy access to forming and sending custom Ethernet frame, ARP messages, IPv4 packets, and TCP/UDP Segments, as well as listening and responding to those protocols
 
 ## Getting Started
-To confirm what you are sending, open up a network analysis tool like Wireshark.
 
 To Install use pip:
 ```
-pip install sendit==1.0.5
+pip install sendit==1.0.6
 ```
 ### Sending data over TCP
 
