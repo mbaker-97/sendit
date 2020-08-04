@@ -1,8 +1,9 @@
-# Provides object of UDP protocol
+"""Creates UDP object and provides methods to parse bytes to UDP create bytes
+to UDP object"""
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -12,21 +13,34 @@ class UDP:
     """
     Creates UDP object from parameters
     UDP checksum is optional and therefore not currently supported
-    TODO: provide checksum with psuedo header
+    
     :param src_prt: source port
+    :type src_prt: int
     :param dst_prt: destination port
-    :param src_ip: source IP address - used for creating pseudoheader to calculate checksum
-    :param dst_ip: destination IP address - used for creating pseudoheader to calculate checksum
-    :param version: version of IP being carried in - used for calculating checksum
-    :param length: length of segment - default to 0, calculated when as_bytes called if 0. If UDP object created from
-                   parser function, set to length of captured segment and NOT recalculated in as_bytes unless set to 0
-                   manually or by calling reset_calculated_fields function
-    :param checksum - default set to 0 and calculated when as_bytes called if 0. If UDP object created from
-                   parser function, set to checksum of captured segment and NOT recalculated in as_bytes unless set to 0
-                   manually or by calling reset_calculated_fields function
+    :type dst_prt: int
+    :param src_ip: source IP address - used for creating pseudoheader to \
+        calculate checksum
+    :type src_ip: String
+    :param dst_ip: destination IP address - used for creating pseudoheader to \
+        calculate checksum
+    :type dst_ip: String
+    :param version: version of IP being carried in - used for calculating \
+        checksum
+    :version type: int
+    :param length: length of segment, defaults to 0, calculated when as_bytes \
+        called if 0. If UDP object created from parser function, set to \
+        length of captured segment and NOT recalculated in as_bytes unless \
+        set to 0 manually or by calling reset_calculated_fields function
+    :type length: int
+    :param checksum: default set to 0 and calculated when as_bytes called if 0 \
+        If UDP object created from parser function, set to checksum of \
+        captured segment and NOT recalculated in as_bytes unless set to 0 \
+        manually or by calling reset_calculated_fields function
+    :type checksum: int
     :param payload: payload to be carried UDP
-    :raise ValueError if src is not valid src port number
-    :raise ValueError if dst is not valid dst port number
+    :type payload: bytes
+
+    :raise ValueError: if src_prt or dst_prt is between 0 and 65535 inclusive
     """
 
     def __init__(self, src_prt, dst_prt, src_ip, dst_ip, payload, version=4, length=0, checksum=0):
@@ -50,7 +64,8 @@ class UDP:
         """
         Converts UDP to proper format of payload bytes to send
         self.payload is converted to bytes with str.encode(self.payload)
-        :return: - bytes representation of UDP
+        :return: bytes representation of UDP
+        :rtype: bytes
         """
 
         # Calculate length if not manually set Convert payload try to call as_bytes function for application layer -
@@ -79,7 +94,9 @@ class UDP:
         """
         Class method that creates UDP object
         :param data: UDP segment passed in as bytes
+        :type data: bytes
         :return: UDP object created from values in data
+        :rtype: UDP
         """
 
         src = int.from_bytes(data[0:2], 'big')
@@ -96,7 +113,8 @@ class UDP:
     def parse_further_layers(self, recursive=True):
         """
         Method that parses higher layers
-        :param recursive - boolean value of whether parsing funciton should - default of True
+        :param recursive: boolean value of whether parsing funciton should - default of True
+        :type recursive: boolean
         be called recursively through all layers
         """
         try:
@@ -113,8 +131,9 @@ class UDP:
 
     def __str__(self):
         """
-        Create string representation of IPv4 object
-        :return: string of IPv4
+        Create string representation of UDP object
+        :return: string of UDP
+        :rtype: String
         """
         header = "*" * 20 + "_UDP_" + "*" * 20
         src = "Source: " + str(self.src_prt)

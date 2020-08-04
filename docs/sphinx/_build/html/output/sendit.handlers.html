@@ -1,0 +1,484 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sendit.handlers package &mdash; Sendit 1.0.5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Sendit
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">sendit.handlers package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-sendit.handlers.arp_handler">sendit.handlers.arp_handler module</a></li>
+<li><a class="reference internal" href="#module-sendit.handlers.ethernet_handler">sendit.handlers.ethernet_handler module</a></li>
+<li><a class="reference internal" href="#module-sendit.handlers.ipv4_handler">sendit.handlers.ipv4_handler module</a></li>
+<li><a class="reference internal" href="#module-sendit.handlers.ipv6_handler">sendit.handlers.ipv6_handler module</a></li>
+<li><a class="reference internal" href="#module-sendit.handlers.raw_nic">sendit.handlers.raw_nic module</a></li>
+<li><a class="reference internal" href="#module-sendit.handlers.udp_handler">sendit.handlers.udp_handler module</a></li>
+<li><a class="reference internal" href="#module-sendit.handlers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Sendit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>sendit.handlers package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/output/sendit.handlers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sendit-handlers-package">
+<h1>sendit.handlers package<a class="headerlink" href="#sendit-handlers-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sendit.handlers.arp_handler">
+<span id="sendit-handlers-arp-handler-module"></span><h2>sendit.handlers.arp_handler module<a class="headerlink" href="#module-sendit.handlers.arp_handler" title="Permalink to this headline">¶</a></h2>
+<p>Creates class that listens and responds to ARP messages</p>
+<dl class="py class">
+<dt id="sendit.handlers.arp_handler.ARP_Listener">
+<em class="property">class </em><code class="sig-name descname">ARP_Listener</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">interface</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reply</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">mappings</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.arp_handler.ARP_Listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interface</strong> (<em>String</em>) – string name of interface to respond to ARP messages
+on, defaults to None</p></li>
+<li><p><strong>reply</strong> (<em>Boolean</em>) – boolean of whether to answer ARP requests, defaults to True</p></li>
+<li><p><strong>mappings</strong> (<em>dictionary with String keys and values</em><em>, </em><em>defaults to None</em>) – dictionary mapping MAC addresses to IPv4 addressses 
+defaults to None. Required if reply is True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – when reply is set to true but mappings is not defined         or when keys in mappings are not valid IPv4 addresses         or when values in mappings are not valid MAC addresses</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sendit.handlers.arp_handler.ARP_Listener.listen">
+<code class="sig-name descname">listen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">queue</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.arp_handler.ARP_Listener.listen" title="Permalink to this definition">¶</a></dt>
+<dd><p>listens and responds for ARP messages coming in on queue, put there by
+an ethernet_handler
+:param queue: Queue which will contain EtherFrames with ARP messages             in them
+:type queue: Queue</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sendit.handlers.ethernet_handler">
+<span id="sendit-handlers-ethernet-handler-module"></span><h2>sendit.handlers.ethernet_handler module<a class="headerlink" href="#module-sendit.handlers.ethernet_handler" title="Permalink to this headline">¶</a></h2>
+<p>Creates class that listens and responds to Layer2 Etherframes</p>
+<dl class="py class">
+<dt id="sendit.handlers.ethernet_handler.Ethernet_Listener">
+<em class="property">class </em><code class="sig-name descname">Ethernet_Listener</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">interface</span></em>, <em class="sig-param"><span class="n">protocols</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.ethernet_handler.Ethernet_Listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interface</strong> (<em>String</em>) – Interface to be listening on</p></li>
+<li><p><strong>protocols</strong> (<em>dictionary</em>) – dictonary where keys are MACs, values are list of         layer 3 protocol listeners</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sendit.handlers.ethernet_handler.Ethernet_Listener.add_listener">
+<code class="sig-name descname">add_listener</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mac</span></em>, <em class="sig-param"><span class="n">listener</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.ethernet_handler.Ethernet_Listener.add_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a higher protocol layer listener into ethernet listener for management
+:param mac: mac address to listen on
+:type mac: String
+:param listener: listener object to add
+:type listener: Protocol Listener Object such as IPv4_Listener,                ARP_Listener, IPv6_Listener</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.handlers.ethernet_handler.Ethernet_Listener.create_threads">
+<code class="sig-name descname">create_threads</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mac</span></em>, <em class="sig-param"><span class="n">protocols</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.ethernet_handler.Ethernet_Listener.create_threads" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates threads for each upper layer listener provided in protocols
+list. Also appends threads and queues created to self.threads and 
+self.queues
+:param mac: string mac address to create thread and queue for
+:type mac: String
+:param protocols: list of higher layer protocol listeners that need             threads and queues instantiated
+:type protocols: list</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.handlers.ethernet_handler.Ethernet_Listener.listen">
+<code class="sig-name descname">listen</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.ethernet_handler.Ethernet_Listener.listen" title="Permalink to this definition">¶</a></dt>
+<dd><p>listens in on self.interface with a raw_nic
+if incoming etherframe has destination of a mac in self.macs to
+listen for, the frames etype field is checked to see if there
+is a corresponding listener for this mac and protocol
+if there is, the frame is passed into the corresponding queue for
+that mac/protocol thread
+if not, frame is discarded</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.handlers.ethernet_handler.Ethernet_Listener.remove_MAC">
+<code class="sig-name descname">remove_MAC</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mac</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.ethernet_handler.Ethernet_Listener.remove_MAC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove MAC address from list of macs that listener will listen for
+Removes corresponding entries in self.mac, self.queues, and self.threads
+:param mac: string of mac address to remove
+:type mac: String</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.handlers.ethernet_handler.Ethernet_Listener.remove_listener">
+<code class="sig-name descname">remove_listener</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mac</span></em>, <em class="sig-param"><span class="n">protocol</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.ethernet_handler.Ethernet_Listener.remove_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove upper layer listener from Ethernet_Listener
+Removes corresponding entries in self.threads and self.queues, and if no more entries for a particular mac, corresponding mac is also removed from self.macs
+:param mac: string of mac address to remove corresponding listener
+:type mac: String
+:param protocol: protocol of listener to remove
+:type protocol: String
+:raise ValueError: if mac not valid MAC address</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sendit.handlers.ipv4_handler">
+<span id="sendit-handlers-ipv4-handler-module"></span><h2>sendit.handlers.ipv4_handler module<a class="headerlink" href="#module-sendit.handlers.ipv4_handler" title="Permalink to this headline">¶</a></h2>
+<p>Creates class that listens and responds to Layer 3 IPv4</p>
+<dl class="py class">
+<dt id="sendit.handlers.ipv4_handler.IPv4_Listener">
+<em class="property">class </em><code class="sig-name descname">IPv4_Listener</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ips</span></em>, <em class="sig-param"><span class="n">listeners</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.ipv4_handler.IPv4_Listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ips</strong> (<em>list of Strings</em>) – list of ips to listen for</p></li>
+<li><p><strong>listeners</strong> (<em>dictionary where keys are strings of IPv4 addresses</em><em>,             </em><em>values are Layer 4 protocol listener objects</em>) – dictionary mapping list of upper layer listeners to IPv4             addresses to forward frames to, defaults to None</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sendit.handlers.ipv4_handler.IPv4_Listener.ip_fragmentation_handler">
+<code class="sig-name descname">ip_fragmentation_handler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.ipv4_handler.IPv4_Listener.ip_fragmentation_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Piece back together fragmented packets
+This is a modified version of the algorithm defined in RFC 815
+<a class="reference external" href="https://tools.ietf.org/html/rfc815">https://tools.ietf.org/html/rfc815</a>
+:param frame: ethernet frame that contains fragmented packet
+:type frame: EtherFrame</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.handlers.ipv4_handler.IPv4_Listener.listen">
+<code class="sig-name descname">listen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">queue</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.ipv4_handler.IPv4_Listener.listen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Listens for frames coming in from queue, placed there by a Layer2 Listener
+If incoming frame contains IPv4 address destination contained in self.ips
+they are then passed to their respective higher level listeners
+Otherwise, they are discarded
+If frames come in with IPv4 fragmented, they are sent to ip_fragmentation_handler
+to be handled
+:param queue: Queue object to listen for incoming frames on
+:type queue: Queue object</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sendit.handlers.ipv6_handler">
+<span id="sendit-handlers-ipv6-handler-module"></span><h2>sendit.handlers.ipv6_handler module<a class="headerlink" href="#module-sendit.handlers.ipv6_handler" title="Permalink to this headline">¶</a></h2>
+<p>Creates class that listens and responds to Layer 3 IPv6</p>
+<dl class="py class">
+<dt id="sendit.handlers.ipv6_handler.IPv6_Listener">
+<em class="property">class </em><code class="sig-name descname">IPv6_Listener</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ips</span></em>, <em class="sig-param"><span class="n">listeners</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.ipv6_handler.IPv6_Listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ips</strong> (<em>List of Strings</em>) – list of IPs to listen for</p></li>
+<li><p><strong>listeners</strong> (<em>dictionary with keys of String IPv6 addresses and values             are upper layer listeners</em>) – dictionary mapping list of upper layer listeners to IPv6             addresses to forward frames to, defaults to None</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sendit.handlers.ipv6_handler.IPv6_Listener.listen">
+<code class="sig-name descname">listen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">queue</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.ipv6_handler.IPv6_Listener.listen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Listen for frames coming in on queue to parse the IPv6 objects inside
+:param queue: Queue to listen in on
+:type queue: Queue object</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sendit.handlers.raw_nic">
+<span id="sendit-handlers-raw-nic-module"></span><h2>sendit.handlers.raw_nic module<a class="headerlink" href="#module-sendit.handlers.raw_nic" title="Permalink to this headline">¶</a></h2>
+<p>Set of classes that creates abstraction for dealing with raw_sockets</p>
+<dl class="py class">
+<dt id="sendit.handlers.raw_nic.Async_Raw_NIC">
+<em class="property">class </em><code class="sig-name descname">Async_Raw_NIC</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">interface</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.raw_nic.Async_Raw_NIC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">socket.socket</span></code></p>
+<p>Child Class of Socket
+Creates Asynchronous Raw Socket, binds to provided interface
+Implements send method that works with rest of library</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>interface</strong> (<em>String</em>) – string name of network interface         ex: eth0, wlan0. Not sure? Call ifconfig and look at interface names</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sendit.handlers.raw_nic.Async_Raw_NIC.recv">
+<em class="property">async </em><code class="sig-name descname">recv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_bytes</span></em>, <em class="sig-param"><span class="n">queues</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.raw_nic.Async_Raw_NIC.recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asynchronously receive bytes
+:param queues: queues to send raw bytes to 
+:type queue: asyncio.queue
+:param n_bytes: Number of bytes to receive
+:type n_bytes: int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sendit.handlers.raw_nic.Async_Raw_NIC.send">
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em>, <em class="sig-param"><span class="n">n_bytes</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.raw_nic.Async_Raw_NIC.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overrides Socket send method
+Attempts to use as_bytes() method that is provided by all protocol classes in this library
+If not a class in this libary, calls str.encode on provided frame
+Them sends on raw socket
+:param frame: frame to send on Raw_NIC
+:type frame: L2 object that has as_bytes function, such as Etherframe</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sendit.handlers.raw_nic.Raw_NIC">
+<em class="property">class </em><code class="sig-name descname">Raw_NIC</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">interface</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.raw_nic.Raw_NIC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">socket.socket</span></code></p>
+<p>Child Class of Socket
+Creates Raw Socket, binds to provided interface
+Implements send method that works with rest of library</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>interface</strong> (<em>String</em>) – string name of network interface         ex: eth0, wlan0. Not sure? Call ifconfig and look at interface names</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sendit.handlers.raw_nic.Raw_NIC.send">
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.raw_nic.Raw_NIC.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overrides Socket send method
+Attempts to use as_bytes() method that is provided by all protocol classes in this library
+If not a class in this libary, calls str.encode on provided frame
+Them sends on raw socket
+:param frame: frame to send on Raw_NIC
+:type frame: L2 object that has as_bytes function, such as Etherframe</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sendit.handlers.udp_handler">
+<span id="sendit-handlers-udp-handler-module"></span><h2>sendit.handlers.udp_handler module<a class="headerlink" href="#module-sendit.handlers.udp_handler" title="Permalink to this headline">¶</a></h2>
+<p>Creates class that listens and responds to Layer 4 UDP</p>
+<dl class="py class">
+<dt id="sendit.handlers.udp_handler.UDP_Listener">
+<em class="property">class </em><code class="sig-name descname">UDP_Listener</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ports</span></em>, <em class="sig-param"><span class="n">listeners</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.udp_handler.UDP_Listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ports</strong> – <ul>
+<li><p>list of ports to listen on</p></li>
+</ul>
+</p></li>
+<li><p><strong>listeners</strong> – default of None, dictionary mapping list of upper         layer listeners to UDP to forward frames to</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sendit.handlers.udp_handler.UDP_Listener.listen">
+<code class="sig-name descname">listen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">queue</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.handlers.udp_handler.UDP_Listener.listen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Listen for frames coming in on queue to parse the UDP objects inside
+:param queue: Queue to listen in on
+:type queue: Queue object</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sendit.handlers">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sendit.handlers" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Matt Baker
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

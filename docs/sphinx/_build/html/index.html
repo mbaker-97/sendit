@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Sendit Documentation &mdash; Sendit 1.0.5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home" alt="Documentation Home"> Sendit
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Sendit Documentation</a></li>
+<li><a class="reference internal" href="#project-info">Project Info</a></li>
+<li><a class="reference internal" href="#installing">Installing</a></li>
+<li><a class="reference internal" href="#basics">Basics</a></li>
+<li><a class="reference internal" href="#sending-data">Sending Data</a></li>
+<li><a class="reference internal" href="#advanced-usage">Advanced Usage</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Sendit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Sendit Documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sendit-documentation">
+<h1>Sendit Documentation<a class="headerlink" href="#sendit-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Sendit is a Python library for handcrafting, sending, and receiving packets. You can modify any value in Ethernet, ARP, IPv4, IPv6, TCP, and UDP protocols and send it. This allows you to send and receive data as a different MAC and/or IP address, do things such as mapping out a network using ARP, modify values to prevent OS fingerprinting, and so much more. While Sendit works at layers 2 to 4, meaning we are working with frames, packets, and segments, for purposes of simplicity in this documentation all units of data will be referred to as packets, their layer specified by the protocol being discussed.</p>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="project-info">
+<h1>Project Info<a class="headerlink" href="#project-info" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Github: <a class="reference external" href="https://github.com/mbaker-97/sendit">https://github.com/mbaker-97/sendit</a></p></li>
+<li><p>PyPi: <a class="reference external" href="https://pypi.org/project/sendit/">https://pypi.org/project/sendit/</a></p></li>
+</ul>
+</div>
+<div class="section" id="installing">
+<h1>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h1>
+<p>Install with pip</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install <span class="nv">sendit</span><span class="o">==</span><span class="m">1</span>.0.6
+</pre></div>
+</div>
+</div>
+<div class="section" id="basics">
+<h1>Basics<a class="headerlink" href="#basics" title="Permalink to this headline">¶</a></h1>
+<p>Every protocol layer is its own object. To create a datagram, we start by creating the highest layer object we are working with, then creating the next highest, and passing the first object to the second, and so on.
+For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sendit.protocols.EtherFrame</span> <span class="kn">import</span> <span class="n">EtherFrame</span>
+<span class="kn">from</span> <span class="nn">sendit.protocols.IPv4</span> <span class="kn">import</span> <span class="n">IPv4</span>
+<span class="kn">from</span> <span class="nn">sendit.protocols.TCP</span> <span class="kn">import</span> <span class="n">TCP</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;The quick brown fox jumps over the lazy dog&quot;</span>  <span class="c1"># String payload</span>
+<span class="n">l4_tcp</span> <span class="o">=</span> <span class="n">TCP</span><span class="p">(</span><span class="mi">50000</span><span class="p">,</span> <span class="mi">50001</span><span class="p">,</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>  <span class="c1"># Change 1st ip to yours, 2nd to target.</span>
+<span class="c1"># Creates IPv4 packet:</span>
+<span class="n">l3</span> <span class="o">=</span> <span class="n">IPv4</span><span class="p">(</span><span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">l4_tcp</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="s2">&quot;tcp&quot;</span><span class="p">)</span>  <span class="c1"># Change 1st ip to yours, 2nd to target</span>
+<span class="c1"># Creates Etherframe:</span>
+<span class="n">l2</span> <span class="o">=</span> <span class="n">EtherFrame</span><span class="p">(</span><span class="s2">&quot;AA:BB:CC:DD:EE:FF&quot;</span><span class="p">,</span> <span class="s2">&quot;00:11:22:33:44:55&quot;</span><span class="p">,</span> <span class="n">l3</span><span class="p">)</span>  <span class="c1"># Change 1st mac to yours, 2nd to target</span>
+</pre></div>
+</div>
+<p>In the above example, l2, the EtherFrame, contains l4_tcp, a TCP object, inside l3, an IPv4 object.</p>
+</div>
+<div class="section" id="sending-data">
+<h1>Sending Data<a class="headerlink" href="#sending-data" title="Permalink to this headline">¶</a></h1>
+<p>Now that you know how to create the data, how do you send it? Sendit has a class called Raw_NIC. Raw_NIC is a wrapper class around a raw socket. All protocols have a as_bytes() function, which turns the data contained in the objects into their properly formatted bytes ready to send on the line. Calling a lower protocol’s as_bytes function calls all higher protocols as_bytes functions. To take the above example, and to expand it. Using a Raw_NIC’s send function automatically calls the as_bytes function of the object passed into it,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sendit.protocols.EtherFrame</span> <span class="kn">import</span> <span class="n">EtherFrame</span>
+<span class="kn">from</span> <span class="nn">sendit.protocols.IPv4</span> <span class="kn">import</span> <span class="n">IPv4</span>
+<span class="kn">from</span> <span class="nn">sendit.protocols.TCP</span> <span class="kn">import</span> <span class="n">TCP</span>
+<span class="kn">from</span> <span class="nn">sendit.handlers.raw_nic</span> <span class="kn">import</span> <span class="n">Raw_NIC</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="s2">&quot;The quick brown fox jumps over the lazy dog&quot;</span>  <span class="c1"># String payload</span>
+<span class="n">l4_tcp</span> <span class="o">=</span> <span class="n">TCP</span><span class="p">(</span><span class="mi">50000</span><span class="p">,</span> <span class="mi">50001</span><span class="p">,</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>  <span class="c1"># Change 1st ip to yours, 2nd to target.</span>
+<span class="c1"># Creates IPv4 packet:</span>
+<span class="n">l3</span> <span class="o">=</span> <span class="n">IPv4</span><span class="p">(</span><span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">l4_tcp</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="s2">&quot;tcp&quot;</span><span class="p">)</span>  <span class="c1"># Change 1st ip to yours, 2nd to target</span>
+<span class="c1"># Creates Etherframe:</span>
+<span class="n">l2</span> <span class="o">=</span> <span class="n">EtherFrame</span><span class="p">(</span><span class="s2">&quot;AA:BB:CC:DD:EE:FF&quot;</span><span class="p">,</span> <span class="s2">&quot;00:11:22:33:44:55&quot;</span><span class="p">,</span> <span class="n">l3</span><span class="p">)</span>  <span class="c1"># Change 1st mac to yours, 2nd to target</span>
+<span class="n">nic</span> <span class="o">=</span> <span class="n">Raw_NIC</span><span class="p">(</span><span class="s2">&quot;lo&quot;</span><span class="p">)</span> <span class="c1"># Creates raw_nic on loopback interface</span>
+<span class="n">nic</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">l2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="advanced-usage">
+<h1>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h1>
+<p>For advanced usage, please read through the documentation of the modules to get a full idea of what each class offers</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+</ul>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Matt Baker
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

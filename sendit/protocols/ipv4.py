@@ -1,8 +1,9 @@
-# Provide object of IPv4 protocol
+"""Creates IPv4 object and provides methods to parse bytes to IPv4 create bytes
+to IPv4 object"""
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -15,24 +16,43 @@ class IPv4:
     """
     Creates IPv4 object from parameters
     :param src: source IP address
+    :type src: String
     :param dst: destination IP address
-    :param payload: payload of the packet - can be TCP or UDP objects, or a string
-    :param id: identification number of packet - default of 0
-    :param length: length of IP packet in bytes - header and data together. Default set to 0 and calculated when
-                   as_bytes called. If IPv4 object created from parser function, takes value of captured IPv4 packet,
-                   and NOT calculated in as_bytes unless reset to 0 manually of with reset_calculated_fields
-    :param df: do not fragment flag - default of False
-    :param mf: more fragments flag - deafult of False
-    :param offset: frag offset of packet - default of 0
-    :param ttl: time to live - default of 64
-    :param protocol: string name of protocol carried in packet.
-                     currently supported values: "tcp", "udp", "icmp", custom int value accepted IF valid
+    :type dst: String
+    :param payload: payload of the packet 
+    :type payload: TCP or UDP objects of String
+    :param id: identification number of packet, defaults to 0
+    :type id: int
+    :param length:total  length of IP packet in bytes - header + data together.\
+            ,defaults to 0, calculated when as_bytes called. If IPv4 object \
+            created from parser function, takes value of captured IPv4 packet,\
+                   and NOT calculated in as_bytes unless reset to 0 manually \
+                   with reset_calculated_fields
+    :type length: int
+    :param df: do not fragment flag, default to False
+    :type df: Boolean
+    :param mf: more fragments flag - deafult to False
+    :type mf: Boolean
+    :param offset: frag offset of packet, default to 0
+    :type offset: int
+    :param ttl: time to live, default to 64
+    :type ttl: int
+    :param protocol: string name of protocol carried in packet.currently \
+            supported values: "tcp", "udp", "icmp", custom int value accepted \
+            IF valid
+    :type protocol: String or int
     :param dscp: differentiated services value - default of 0
+    :type dscp: int
     :param ecn: explicit congestion notification - default of 0
+    :type ecn: int
     :param version: version of IP
-    :param checksum: checksum of packet. By default, not calculated and set to 0 and to be calculated when as_bytes
-                     called. Set when IPv4 object created from parser function, and unless reset manually or with
-                     reset_calculated_fields function, will NOT be recalculated when as_bytes is called
+    :type version: int
+    :param checksum: checksum of packet. By default, not calculated and set to \
+            0 and to be calculated when as_bytes called. Set when IPv4 object \
+            created from parser function, and unless reset manually or with \
+            reset_calculated_fields function, will NOT be recalculated when \
+            as_bytes is called
+    :type checksum: int
     """
 
     def __init__(self, src, dst, payload, id=0, length=0, df=False, mf=False, offset=0, ttl=64, protocol="tcp", dscp=0,
@@ -68,7 +88,8 @@ class IPv4:
         to properly formated bytes to be inserted into packet
         If self.payload is not TCP or UDP object, self.payload is converted to bytes with str.encode(self.payload) if
         possible. Otherwise, it is assumed payload is already bytes
-        :return: - bytes representation of IPv4 Packet
+        :return: bytes representation of IPv4 Packet
+        :rtype: Bytes
         """
         first_byte = int(bin(self.version)[2:].zfill(4) + bin(self.ihl)[2:].zfill(4), 2)
         second_byte = int(bin(self.dscp)[2:].zfill(6) + bin(self.ecn)[2:].zfill(2), 2)
@@ -120,8 +141,9 @@ class IPv4:
     def parse_further_layers(self, recursive = True):
         """
         Method that parses higher layers
-        :param recursive: - boolean value of whether parsing funciton should - default of True
-        be called recursively through all layers
+        :param recursive: Whether parsing function should be called recursively\
+            through all layers, defaults to True
+        type recursive: Boolean
         """
         if self.protocol == "udp":
             self.payload = UDP.udp_parser(self.payload, recursive)
@@ -137,11 +159,13 @@ class IPv4:
     def ipv4_parser(cls, data, recursive=True):
         """
         Class Method that parses group of bytes to create IPv4 Object
-        :param recursive: boolean of whether to parse recursively to higher
-        layers - default is True
-        If protocol is "TCP", payload will be TCP object created
-        If protocol is "UDP", payload will be UDP object created
+        :param recursive: boolean of whether to parse recursively to higher \
+        layers, defaults to True \
+        If protocol is "TCP", payload will be TCP object created \
+        If protocol is "UDP", payload will be UDP object created \
+        :type recursive: Boolean
         :return: IPv4 instance that contains the values that was in data
+        :rtype: IPv4 object
         """
         version = int.from_bytes(data[0:1], 'big') >> 4
         ihl = int.from_bytes(data[0:1], 'big') % 64
@@ -194,7 +218,8 @@ class IPv4:
     def __str__(self):
         """
         Create string representation of IPv4 object
-        :return: string of IPv4
+        :return: String of IPv4
+        :rtype: String
         """
         header = "*" * 20 + "_IPv4_" + "*" * 20
         source = "Source Address: " + self.src

@@ -1,9 +1,10 @@
+"""Sprays ARP requests across provided subnet, prints replies"""
 #!/usr/bin/python3
 # Running on Class A network stores about 1GB of addresses!
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -27,7 +28,10 @@ __status__ = "Development"
 
 def ARP_recv(nic):
     """
-    Function that receives and prints out ARP replies:  MAC address, IP address, and Manufacturer of MAC
+    Function that receives and prints out ARP replies:  MAC address, IP address,
+    and Manufacturer of MAC
+    :param nic: nic to receive ARP replies on
+    :type nic: Raw_NIC
     """
     print("MAC\t\t\tIP\t\tManufacturer")
     while True:
@@ -46,28 +50,33 @@ def ARP_recv(nic):
 
 def ARP_map(network, prefix, interface, mac, ip, rand=False, delay=0.0):
     """
-    Sends out ARP requests across a network, effectively allowing a user to map out hosts on local subnet
+    Sends out ARP requests across a network, effectively allowing a user to map\
+    out hosts on local subnet
     Can be used to root out hosts with duplicate IPs
-    :param interface: String interface to send ARPs out of
-    :param network: String of network IP address
+    :param interface: Name of interface to send ARPs out of
+    :type interface: String name of interface
+    :param network: Network IP address
+    :type network: String
     :param prefix: prefix of subnet
-    :param mac: string MAC address of intended source of ARP requests
-                Usually MAC of host sending out requests
-                Could be spoofed MAC of another host for purpose of DOS, or so that sender and receiver are
-                separate hosts working together
-    :param ip: string IP address of intended source of ARP requests
-                Usually IP of host sending out requests
-                Can be spoofed for same reasons as MAC
-    :param rand: boolean of whether to send ARP requests to targets randomly or in order
-    :param delay: delay between requests in seconds. Be aware of host operating system's limitations on minimum sleep
-                    time
-    :raise TypeError if sock not valid Socket object
-    :raise ValueError if prefix not between 8 and 32 inclusive
-    :raies ValueError if delay is negative value
-    :raise ValueError if network is not valid IPv4 addersss
-    :raise ValueError if ip is not valid IPv4 address
-    :raise ValueError if mac is not valid MAC address
-    :return: None
+    :type prefix: int
+    :param mac: string MAC address of intended source of ARP requests. Not \
+        neccessarily MAC of your NIC
+    :type mac: String
+    :param ip: string IP address of intended source of ARP requests. Not \
+        neccessarily IP of your NIC
+    :type ip: String
+    :param rand: boolean of whether to send ARP requests to targets randomly \
+        or in order
+    :type rand: Boolean
+    :param delay: delay between requests in seconds. Be aware of host \
+        operating system's limitations on minimum sleep time
+    :type delay: int
+    :raise TypeError: if sock not valid Socket object
+    :raise ValueError: if prefix not between 8 and 32 inclusive, \
+        or if delay is negative \
+        or of network is not valid IPv4 address \
+        or if ip is not valid IPv4 address \
+        or if mac is not valid MAC address \
     """
     # Do value and type checking:
 

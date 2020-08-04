@@ -1,8 +1,9 @@
-# Creates class that listens and responds to Layer2 Etherframes
+#!/usr/bin/python3
+""" Creates class that listens and responds to Layer2 Etherframes """
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -13,14 +14,16 @@ from threading import Thread, enumerate
 from queue import Queue
 
 class Ethernet_Listener():
+    """
+    :param interface: Interface to be listening on
+    :type interface: String
+    :param protocols: dictonary where keys are MACs, values are list of \
+        layer 3 protocol listeners
+    :type protocols: dictionary
+    """
 
     def __init__(self, interface, protocols): 
-        """
-        Constructor for Ethernet_Listener
-        :param interface: string of interface to be listening on
-        :param protcols: dictonary where keys are MACs, values are list of
-                         layer 3 protocol listeners
-        """
+        """Constructor for Ethernet_Listener"""
         self.interface = interface
         self.threads = dict() # dictionary that maps <MAC_protocol> to thread 
         #object - example: AA:BB:CC:11:22:33_arp
@@ -38,8 +41,10 @@ class Ethernet_Listener():
         list. Also appends threads and queues created to self.threads and 
         self.queues
         :param mac: string mac address to create thread and queue for
-        :param protocols: list of higher layer protocol listeners that need
-        threads and queues instantiated
+        :type mac: String
+        :param protocols: list of higher layer protocol listeners that need \
+            threads and queues instantiated
+        :type protocols: list
         """
         for protocol in protocols:
             name = mac + "_" + type(protocol).__name__.split("_")[0].lower()
@@ -83,8 +88,6 @@ class Ethernet_Listener():
         if there is, the frame is passed into the corresponding queue for
         that mac/protocol thread
         if not, frame is discarded
-
-        Currently this supports frame.etype of arp
         """
 #Raw Nic will be created here
         nic = Raw_NIC(self.interface)
@@ -107,6 +110,7 @@ class Ethernet_Listener():
         Remove MAC address from list of macs that listener will listen for
         Removes corresponding entries in self.mac, self.queues, and self.threads
         :param mac: string of mac address to remove
+        :type mac: String
         """
         if helper.is_valid_mac(mac):
             try:
@@ -135,7 +139,10 @@ class Ethernet_Listener():
         Remove upper layer listener from Ethernet_Listener
         Removes corresponding entries in self.threads and self.queues, and if no more entries for a particular mac, corresponding mac is also removed from self.macs
         :param mac: string of mac address to remove corresponding listener
+        :type mac: String
         :param protocol: protocol of listener to remove
+        :type protocol: String
+        :raise ValueError: if mac not valid MAC address
         """
         mac = mac.upper()
         protocol = protocol.lower()
@@ -167,7 +174,10 @@ class Ethernet_Listener():
         """
         Add a higher protocol layer listener into ethernet listener for management
         :param mac: mac address to listen on
+        :type mac: String
         :param listener: listener object to add
+        :type listener: Protocol Listener Object such as IPv4_Listener,\
+                ARP_Listener, IPv6_Listener
         """
 
         if not is_valid_MAC(mac):

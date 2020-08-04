@@ -1,23 +1,29 @@
-# Creates class that listens and responds to Layer 3 IPv4
+#!/usr/bin/python3
+""" Creates class that listens and responds to Layer 3 IPv4"""
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
 from ipaddress import ip_address, AddressValueError
 from sendit.protocols.ipv4 import IPv4
+from collections import defaultdict
 
 
 class IPv4_Listener():
-    
+    """ 
+    :param ips: list of ips to listen for
+    :type ips: list of Strings
+    :param listeners: dictionary mapping list of upper layer listeners to IPv4 \
+            addresses to forward frames to, defaults to None
+    :type listeners: dictionary where keys are strings of IPv4 addresses, \
+            values are Layer 4 protocol listener objects
+    """
     def __init__(self, ips, listeners=None):
         """
         Constructor for IPv6_listener
-        :param ips: - list of ips to listen for
-        :param listeners: default of None, dictionary mapping list of upper
-        layer listeners to IPv4 addresses to forward frames to
         """
         for ip in ips:
             try:
@@ -27,9 +33,11 @@ class IPv4_Listener():
         self.ips = ips
         self.listeners = listeners
         # This dictionary will map a list of pieces of data to a IP_PacketID
-        self.frag_data = dict()
+        self.frag_data = defaultdict(lambda: [0] * 30000)
+
         # This dictionary will map a list of holes in data to a IP_PacketID
-        self.frag_holes = dict()
+        self.frag_holes = defaultdict(lambda: [(0, 30000)])
+
     
 
     def ip_fragmentation_handler(self, frame):
@@ -38,16 +46,12 @@ class IPv4_Listener():
         This is a modified version of the algorithm defined in RFC 815
         https://tools.ietf.org/html/rfc815
         :param frame: ethernet frame that contains fragmented packet
+        :type frame: EtherFrame
         """
         entry_name =str(frame.payload.src) + "_" +  str(frame.payload.dst) + "_" + str(frame.payload.protocol) + "_" + str(frame.payload.id)
-        string = ""
-        # first check if there is an entry for this IP addr and packet ID
-        # Pre step 1 in algorithm description
-        if entry_name not in self.frag_data.keys():
-            # Create empty buffer in frag_data and one large hole from 0 to 15000 in frag_holes
-            self.frag_data[entry_name] = [0] * 15000
-            self.frag_holes[entry_name] = [(0, 15000)]
         
+        # If entry does not exist, we default to holes being list containing tuple of 0 to large number
+        # and data being a long list of all 0s
         holes = self.frag_holes[entry_name]
         data = self.frag_data[entry_name]
 
@@ -58,8 +62,7 @@ class IPv4_Listener():
         # Step 1 of Algorithm - go through holes
         for hole in holes:
 
-            hole_first = hole[0]
-            hole_last = hole[1]
+            hole_first, hole_last  = hole[0], hole[1]
             # Steps 2 and 3, see if this fragment fits in this hole
             if frag_first > hole_last or frag_last < hole_first: 
                 continue
@@ -98,6 +101,7 @@ class IPv4_Listener():
 
 
 
+    # TODO - add in L4 handlers
     def listen(self, queue):
         """
         Listens for frames coming in from queue, placed there by a Layer2 Listener
@@ -107,6 +111,7 @@ class IPv4_Listener():
         If frames come in with IPv4 fragmented, they are sent to ip_fragmentation_handler
         to be handled
         :param queue: Queue object to listen for incoming frames on
+        :type queue: Queue object
         """
         while True:
             frame = queue.get()
@@ -115,26 +120,8 @@ class IPv4_Listener():
             if frame.payload.dst in self.ips:
                 # Check if this packet is fragmented
                 if frame.payload.mf or frame.payload.offset != 0:
-                    string = ""
-                    for char in frame.payload.payload:
-                        string = "".join((string,chr(char)))
-                        print(string)
-                    print(frame.payload)
                     # Returns only when packet completely pieced back together
                     frame  = self.ip_fragmentation_handler(frame)
+                print(frame.payload)
                             
-                    if frame is None:
-                        continue
-                    else:
-                        print("Completed:")
-                        print(frame.payload)
-                        string = ""
-                        for char in frame.payload.payload:
-                            string = "".join((string,chr(char)))
-                        print(string)
-                            
-
-
-
-
 

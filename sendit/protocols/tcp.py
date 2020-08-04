@@ -1,8 +1,9 @@
-# Provides object of TCP protocol
+"""Creates TCP object and provides methods to parse bytes to TCP create bytes
+to TCP object"""
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -11,47 +12,81 @@ from sendit.helper_functions.helper import checksum, form_pseudo_header
 class TCP:
     """
     Forms TCP Object from parameters
+
     :param src_prt: source TCP port
+    :type src_prt: int
     :param dst_prt: destination TCP port
+    :type dst_prt: int
     :param src_ip: source IP address - used for creating pseudoheader to calculate checksum
-    :param dst_ip: destination IP address - used for creating pseudoheader to calculate checksum
+    :type src_ip: String
+    :param dst_ip: destination IP address - used for creating pseudoheader to \
+        calculate checksum
+    :type dst_ip: String
     :param window: window size
-    :param payload: payload - in string format
+    :type window: int
+    :param payload: payload of TCP Segment
+    :type payload: String
     :param sqn:  sequence Number
+    :type sqn: int
     :param ack_num: Acknowledgement Number
-    :param offset: byte offset of where data starts - default of 5
-    :param ns: ns flag - default of False
-    :param cwr: cwr flag - default of False
-    :param ece: ece flag - default of False
-    :param urg: urg flag - default of False
-    :param ack: ack flag - default of False
-    :param psh: psh flag - default of False
-    :param rst: rst flag - default of False
-    :param syn: syn flag - default of False
-    :param fin: fin flag - default of False
+    :type ack_num: int
+    :param offset: 4 byte word offset of where data starts, defaults to 5
+    :type offset: int
+    :param ns: ns flag, defaults to False
+    :type ns: boolean
+    :param cwr: cwr flag, defaults to False
+    :type cwr: boolean
+    :param ece: ece flag, defaults to False
+    :type ece: boolean
+    :param urg: urg flag, defaults to False
+    :type urg: boolean
+    :param ack: ack flag, defaults to False
+    :type ack: boolean
+    :param psh: psh flag, defaults to False
+    :type psh: boolean
+    :param rst: rst flag, defaults to False
+    :type rst: boolean
+    :param syn: syn flag, defaults to False
+    :type syn: boolean
+    :param fin: fin flag, defaults to False
+    :type fin: boolean
     :param urg_pnt: offset of where urgent data stops
+    :type urg_pnt: int
     :param mss: maximum segment size TCP option
+    :type mss: int
     :param scaling: window scaling factor TCP option
-    :param sack_permitted: boolean value of whether selective acknowledgments allowed - TCP option
-    :param sack: tuple containing bytes, in order, to be passes as selective acknowledgments TCP option
+    :type scaling: int
+    :param sack_permitted: boolean value of whether selective acknowledgments \
+        allowed - TCP option
+    :type sack_permitted: boolean
+    :param sack: tuple containing byte numbers, in order, to be passes as \
+        selective acknowledgments TCP option
+    :type sack: tuple of ints
     :param stamp: tuple containing timestamp value and time stamp error
-    :param checksum - default set to 0 and calculated when as_bytes called if 0. If TCP object created from
-                   parser function, set to checksum of captured segment and NOT recalculated in as_bytes unless set to 0
-                   manually or by calling reset_calculated_fields function
-    :raise ValueError when src_prt not between 0 and 65535 inclusive
-    :raise ValueError when dst_port not between 0 and 65535 inclusive
-    :raise ValueError when sqn not between 0 and 4294967295 inclusive
-    :raise ValueError when ack_number not between 0 and 4294967295 inclusive
-    :raise ValueError when window not between 0 and 4294967295 inclusive
-    :raise ValueError when urg_pnt not between 0 and 4294967295 inclusive
-    :raise ValueError when length of sack greater than 8
-    :raise ValueError when sack contains odd number of values
+    :type stamp: tuple of ints
+    :param checksum: default set to 0 and calculated when as_bytes called if 0 \
+        If TCP object created from parser function, set to checksum of \
+        captured segment and NOT recalculated in as_bytes unless set to 0 \
+        manually or by calling reset_calculated_fields function
+    :type checksum: int
+
+    :raise ValueError when src_prt or dst_prt  not between 0 and 6553 \
+        inclusive \
+        or when sqn not between 0 and 4294967295 inclusive \
+        or  when ack_number not between 0 and 4294967295 inclusive \
+        or when window not between 0 and 4294967295 inclusive \
+        or when urg_pnt not between 0 and 4294967295 inclusive \
+        or when length of sack greater than 8 \
+        or when sack contains odd number of values
 
     """
 
     def __init__(self, src_prt, dst_prt, src_ip, dst_ip, window, payload, sqn=0, ack_num=0, ns=False,
                  cwr=False, ece=False, urg=False, ack=False, psh=False, rst=False, syn=False, fin=False, urg_pnt=0,
                  version=4, mss=None, scaling=None, sack_permitted=None, stamp=None, sack=None, offset=5, checksum=0):
+        """
+        Constructor for TCP
+        """
 
         if src_prt > 65535 or src_prt < 0:
             raise ValueError("src_prt must be valid TCP port")
@@ -117,6 +152,7 @@ class TCP:
 
         TODO handle sack value
         :return: tuple consisting of bytes of options for this TCP segment and increase to options header
+        :rtype: tuple of bytes
         """
 
         nop = 1  # nop value
@@ -203,7 +239,8 @@ class TCP:
         """
         Converts TCP to proper format of payload bytes to send
         self.payload is converted to bytes with str.encode(self.payload)
-        :return: - bytes representation of TCP
+        :return: bytes representation of TCP
+        :rtype: bytes
         """
 
         # Creates bytes object of options, modifies offset value
@@ -259,7 +296,15 @@ class TCP:
         return pack('!HHIIBBHHH', self.src_prt, self.dst_prt, self.sqn, self.ack_num, offset, flags, self.window, self.checksum, self.urg_pnt) + options[0] + payload
 
 
-    def parse_options(option_bytes):
+    def parse_options(self, option_bytes):
+        """
+        Parses TCP header options from a series of byte
+        :param option_bytes: series of bytes containing TCP Header options
+        :type option_bytes: bytes
+        :return: list of options to return containing [MSS, Window Scale, \
+                sack_permitted, sack_values, timestamp]
+        :rtype: list
+        """
         # list of options to return. Values are, in order,
         # MSS, Window Scale, sack permitted, sack values, timestamp
         options = [None, None, None, None, None]
@@ -303,12 +348,15 @@ class TCP:
 
 
 
+
     @classmethod
     def tcp_parser(cls, data, recursive=True):
         """
         Class method that creates TCP object
         :param data: TCP segment passed in as bytes
+        :type param: bytes
         :return: TCP object created from values in data
+        :rtype: TCP
         """
 
         src = int.from_bytes(data[0:2], 'big')
@@ -358,9 +406,11 @@ class TCP:
 
     def parse_further_layers(self, recursive=True): 
         """
-        Method that parses higher layers
-        :param recursive - boolean value of whether parsing funciton should
-        be called recursively through all layers
+        Method that parses higher layers and sets the payload of calling TCP
+        object
+        :param recursive: boolean value of whether parsing function should \
+            be called recursively through all layers
+        :type recursive: true
         """
         
         try:
@@ -378,8 +428,9 @@ class TCP:
 
     def __str__(self):
         """
-        Create string representation of IPv4 object
-        :return: string of IPv4
+        Create string representation of TCP object
+        :return: string of TCP
+        :rtype: String
         """
         header = "*" * 20 + "_UDP_" + "*" * 20
         src = "Source: " + str(self.src_prt)
@@ -404,6 +455,4 @@ class TCP:
         return "\n".join((header, src, dst, length, sqn, ack_num, flags, 
             separator, urg, ack, psh, rst, syn, fin, separator, window, offset,
             urg_pnt, trailer))
-
-
 

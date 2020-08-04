@@ -1,0 +1,364 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sendit.helper_functions package &mdash; Sendit 1.0.5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Sendit
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">sendit.helper_functions package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-sendit.helper_functions.helper">sendit.helper_functions.helper module</a></li>
+<li><a class="reference internal" href="#module-sendit.helper_functions">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Sendit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>sendit.helper_functions package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/output/sendit.helper_functions.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sendit-helper-functions-package">
+<h1>sendit.helper_functions package<a class="headerlink" href="#sendit-helper-functions-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sendit.helper_functions.helper">
+<span id="sendit-helper-functions-helper-module"></span><h2>sendit.helper_functions.helper module<a class="headerlink" href="#module-sendit.helper_functions.helper" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="sendit.helper_functions.helper.MAC_to_manufacturer">
+<code class="sig-name descname">MAC_to_manufacturer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">address</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.helper_functions.helper.MAC_to_manufacturer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a MAC Address and searches through CSV files from IEEE to find 
+manufacturer they belong to
+:param address: MAC Address, bytes separated with colon (:)
+:type address: String
+:return: String of manufacturer of device with provided MAC Address         “Unknown” if not found
+:rtype: String</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sendit.helper_functions.helper.addr_to_bytes">
+<code class="sig-name descname">addr_to_bytes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">address</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.helper_functions.helper.addr_to_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes address represented in string consisting of hex characters, MAC or 
+IPv6, and converts to bytes
+:param address:  addrss to convert
+:type address: String
+:return: bytes form of address
+:rtype: bytes</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sendit.helper_functions.helper.bytes_to_MAC">
+<code class="sig-name descname">bytes_to_MAC</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">address</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.helper_functions.helper.bytes_to_MAC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts bytes form of MAC address to String form of MAC address
+:param address: Bytes form of MAC address
+:type address: bytes
+:return: String form of MAC Address
+:rtype: String</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sendit.helper_functions.helper.checksum">
+<code class="sig-name descname">checksum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.helper_functions.helper.checksum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates 16 bit checksum by 1’s compliment addition between all 16 bit     words in message, and then taking the 1’s compliment of the sum
+Formula same as defined for IPv4, TCP, and UDP
+:param message: takes header to create checksum
+:type message: bytes
+:return: 16 bit checksum
+:rtype: int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sendit.helper_functions.helper.form_pseudo_header">
+<code class="sig-name descname">form_pseudo_header</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src_ip</span></em>, <em class="sig-param"><span class="n">dst_ip</span></em>, <em class="sig-param"><span class="n">length</span></em>, <em class="sig-param"><span class="n">protocol</span></em>, <em class="sig-param"><span class="n">version</span><span class="o">=</span><span class="default_value">4</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.helper_functions.helper.form_pseudo_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Form TCP/UDP pseudoheader for checksum calculation
+:param src_ip: source ip
+:type src_ip: String
+:param dst_ip: destination ip
+:type dst_ip: String
+:param length: length of tcp segment, header included
+:type length: int
+:param protocol: L4 Protocol - currently only support tcp and udp
+:type protocol: String
+:param version: IP version, defaults to 4
+:type version: int
+:return: pseudoheader in bytes
+:rtype: bytes</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sendit.helper_functions.helper.get_MAC">
+<code class="sig-name descname">get_MAC</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">interface</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.helper_functions.helper.get_MAC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds MAC address of a network interface on the host
+Uses Unix tools ifconfig and grep
+Not supported on all Operating Systems, or all kernels
+:param interface: string of the interface to look for
+:type interface: String
+:return: string representing MAC address of interface         if OS does not support commands or interface not found, program         exits with code 1
+:rtype: String</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sendit.helper_functions.helper.get_ip">
+<code class="sig-name descname">get_ip</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">interface</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.helper_functions.helper.get_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds IP of a network interface on the host
+Uses UNIX tools ifconfig, grep, and awk
+Not supported on all Operating Systems or all kernels
+:param interface: string of the interface to look for
+:type interface: String
+:return: string representing MAC address of interface              if OS does not support commands or interface not found, program exits with code 1
+:rtype: String</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sendit.helper_functions.helper.int_to_ip">
+<code class="sig-name descname">int_to_ip</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">number</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.helper_functions.helper.int_to_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts int to string IPv4 address
+:param number: int to convert to string IPv4 address
+:type number: int
+:return: String of IPv4 address
+:rtype: String</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sendit.helper_functions.helper.ip_to_int">
+<code class="sig-name descname">ip_to_int</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">address</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.helper_functions.helper.ip_to_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts string IP addrss to an int
+:param address: string IP address
+:type address: String
+:return: int representing IP address
+:rtype: int
+:raise ValueError: if address is not  valid IPv4 addrss</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sendit.helper_functions.helper.is_hex">
+<code class="sig-name descname">is_hex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">string</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.helper_functions.helper.is_hex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if string consists solely of ascii characters that are         hexidecimal characters
+:param string: string to check if hex
+:type string: String
+:return: boolean representing if the string consists of only hex ascii         characters
+:rtype: Boolean</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sendit.helper_functions.helper.is_valid_MAC">
+<code class="sig-name descname">is_valid_MAC</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">address</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.helper_functions.helper.is_valid_MAC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if address if valid MAC address
+Checks that there are 12 characters, and all are Hex values
+:param address: value to check if valid MAC address
+:type address: String
+:return: boolean representing if address is a valid MAC address
+:rtype: Boolean</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sendit.helper_functions.helper.is_valid_ipv4">
+<code class="sig-name descname">is_valid_ipv4</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">address</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.helper_functions.helper.is_valid_ipv4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if address if valid IPv4 address
+Checks that there are 4 octets, and values are between 0 and 255, inclusive
+:param address: value to check if valid IPv4 address
+:type address: String
+:return: boolean representing if address is a valid IPv4 address
+:rtype: Boolean</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sendit.helper_functions.helper.manufacturer_to_MAC">
+<code class="sig-name descname">manufacturer_to_MAC</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">manufacturer</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sendit.helper_functions.helper.manufacturer_to_MAC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides a list of MAC prefixes based off provided manufacturer
+:param manufacturer: Name of manufacturer
+:type manufacturer: String
+:return: list of strings of 3 byte MAC prefixes registered to that         manufacturer
+:rtype: list of Strings</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sendit.helper_functions">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sendit.helper_functions" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Matt Baker
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

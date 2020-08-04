@@ -1,8 +1,9 @@
-
+"""Creates IPv6 object and provides methods to parse bytes to IPv6 and create 
+bytes to IPv6 object"""
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -15,19 +16,34 @@ class IPv6:
     """
     Creates IPv6 object from parameters
     :param src: source IPv6 address
+    :type src: String
     :param dst: destination IPv6 address
+    :type dst: String
     :param payload: payload to be encapsulated inside IPv6 packet
-    :param next: next header - string - default "tcp". "udp" and "icmp" also supported
+    :type payload: TCP or UDP object, or String
+    :param next: next header protocol,  defaults to "tcp". "udp" and "icmp" \
+            also supported
+    :type next: String
     :param limit: hop count limit - 0 to 255 inclusive
-    :param flow_label: label for which flow packet belongs to - default is 0 - none
-    :param ds: Differentiated Services field
-    :param ecn: - Explicit Congestion Notification value
-    :param version: IP version: default of 6
-    :param length: length of IPv6 packet - default set to 0 and calculated in as_bytes function. If IPv6 object created
-                   with parser method, will take value of IPv6 packet captured, and will NOT be calculated in as_bytes
-                   unless reset manually to 0 or with reset_calculated_fields function
+    :type limit: int
+    :param flow_label: label for which flow packet belongs to, defaults to 0 - \
+            which is not flow
+    :type flow_label: int
+    :param ds: Differentiated Services field, defaults to 0
+    :type ds: int
+    :param ecn:  Explicit Congestion Notification value, defaults to 0
+    :type ecn: int
+    :param version: IP version, defaults to 6
+    :type version: int
+    :param length: length of IPv6 packet, defaults to 0 and calculated in \
+            as_bytes function. If IPv6 object created with parser method, will \
+            take value of IPv6 packet captured, and will NOT be calculated in \
+            as_bytes unless reset manually to 0 or with reset_calculated_fields\
+            function
+    :type length: int
     """
-
+    
+    #TODO - do more value checking
     def __init__(self, src, dst, payload, next="tcp", limit=64, flow_label=0, ds=0, ecn=0, version=6, length=0):
         """init for IPv6"""
         # Check validity of addresses
@@ -66,7 +82,8 @@ class IPv6:
         If self.payload is TCP or UDP object, their as_bytes function is called, providing the conversion of payload
         to properly formated bytes to be inserted into packet
         If self.payload is not TCP or UDP object, self.payload is converted to bytes with str.encode(self.payload)
-        :return: - bytes representation of IPv6 Packet
+        :return: bytes representation of IPv6 Packet
+        :rtype: bytes
         """
         first_byte = ((self.version << 4) + (self.ds >> 2))
         second_byte = (((self.ds % 4) << 6) + (self.ecn << 4) + (self.flow_label >> 16))
@@ -108,10 +125,12 @@ class IPv6:
     def ipv6_parser(cls, data, recursive=True):
         """
         Class Method that parses group of bytes to create IPv6 Object
-        :param data: ipv6 packet passed in as bytes
+        :param data: IPv6 packet passed in as bytes
+        :type data: bytes
         If protocol is "TCP", payload will be TCP object created
         If protocol is "UDP", payload will be UDP object created
         :return: IPv6 instance that contains the values that was in data
+        :rtype: IPv6 
         """
         version = int.from_bytes(data[0:1], 'big') >> 4
         traffic_class = int.from_bytes(data[0:2], 'big')
@@ -142,7 +161,8 @@ class IPv6:
     def parse_further_layers(self, recursive=True):
         """
         Method that parses higher layers
-        :param recursive - boolean value of whether parsing funciton should
+        :param recursive: boolean value of whether parsing funciton should
+        :type return: Boolean
         be called recursively through all layers
         """
 
@@ -159,6 +179,8 @@ class IPv6:
     def __str__(self):
         """
         Create string representation of IPv6 object
+        :return: String representation
+        :rtype: String
         """
         header = "*" * 20 + "_IPv6_" + "*" * 20
         source = "Source Address: " + str(ip_address(self.src)).upper()
@@ -179,8 +201,5 @@ class IPv6:
         trailer = "*" * 46
 
         return "\n".join((header, source, dest, length, nxt, limit, label, differ, ecn, version, trailer))
-
-
-
 
 

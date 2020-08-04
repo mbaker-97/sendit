@@ -1,8 +1,9 @@
-#!/bin/python3
+#!/usr/bin/python3
+""" Provides example of how to listen for IPv4 objects"""
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"

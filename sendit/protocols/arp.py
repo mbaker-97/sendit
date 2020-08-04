@@ -1,8 +1,9 @@
-# Creates object of ARP protocol
+"""Creates ARP  object and provides methods to parse bytes to ARP create bytes
+to ARP object"""
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -13,23 +14,46 @@ class ARP:
     """
     Holds all data for ARP
 
-    :param sha: string of source MAC address
+    :param sha: Source MAC  address
+    :type sha: String, formatted as "XX:XX:XX:XX:XX:XX"
     :param spa: string of source IP address
+    :type spa: String, formated as "XXX.XXX.XXX.XXX"
     :param tha: string of target MAC address
-    :param tpa: string of target IP address
-    :param hrd: hardware code, defaul to 1 for ethernet
-    :param pro: type of protocol address - default to 2048 for IPv4 - corresponds to Ethertype values
-    :param hln: length of hardware address in bytes - default to 6 for MAC length
-    :param pln: length of protocol address in bytes - default to 4 for IPv4 length
-    :param op: opcode of arp message - default to 1 for request
-    :raise ValueError if opcode is not between 1 and 9 inclusive
+    :type tha: String, formatted as "XX:XX:XX:XX:XX:XX"
+    :param tpa: string of target IP address"
+    :type tpa: String, formated as "XXX.XXX.XXX.XXX"
+    :param hrd: hardware code, defaults to 1 for ethernet
+    :type hrd: int 
+    :param pro: type of protocol address - corresponds to Ethertype values, defaults to 2048 for IPv4
+    :type pro: int
+    :param hln: length of hardware address in bytes, defaults to 6 for MAC length
+    :type hln: int
+    :param pln: length of protocol address in bytes, defaults to 4 for IPv4 length
+    :type pln: int
+    :param op: opcode of arp message, defaults to 1 for request
+    :type op: int
+    :raise ValueError: if opcode, hrd, or  pln is not between 0 and 65535 \
+            inclusive or hln or pln is not between 0 and 255 inclusive
     """
 
     def __init__(self, sha, spa, tha, tpa, hrd=1, pro=2048, hln=6, pln=4, op=1):
         """Init for ARP"""
-        if op > 9 or op < 1:
+        if op < 0 or op > 65535:
             # INVALID VALUE
-            raise ValueError("op must be valid ARP op code, 1-9")
+            raise ValueError("op must be valid 16 bit int, 0-65535 inclusive")
+        if hrd < 0 or hrd  > 65535:
+            # INVALID VALUE
+            raise ValueError("hrd must be valid 16 bit int, 0-65535 inclusive")
+        if pro < 0 or pro  > 65535:
+            # INVALID VALUE
+            raise ValueError("pro must be valid 16 bit int, 0-65535 inclusive")
+        if hln < 0  or hln > 255:
+            # INVALID VALUE
+            raise ValueError("hln must be valid 8 bit int, 0-255 inclusive")
+        if pln < 0  or pln > 255:
+            # INVALID VALUE
+            raise ValueError("pln be valid 8 bit int, 0-255 inclusive")
+
         self.hrd = hrd  # default is ethernet
         self.pro = pro  # default is IPv4
         self.hln = hln  # length of MAC is 6 bytes
@@ -44,6 +68,7 @@ class ARP:
         """
         Converts ARP to proper format of payload bytes
         :return: bytes representation of ARP message
+        :rtype: bytes
         """
         spa = inet_aton(self.spa)
         sha = addr_to_bytes(self.sha)
@@ -57,7 +82,9 @@ class ARP:
         """
         Class Method that parses group of bytes to create ARP object
         :param data: ARP message to parse passed in as bytes
+        :type data: bytes
         :return: ARP instance that contains the values that was in data
+        :rtype: ARP object
         """
         hrd = int.from_bytes(data[0:2], 'big')
         pro = int.from_bytes(data[2:4], 'big')
@@ -74,6 +101,8 @@ class ARP:
     def __str__(self):
         """
         Gives string representation of ARP object
+        :return: String representation of ARP object
+        :rtype: String
         """
         header = "*" * 20 + "__ARP__" + "*" * 20
         sha = "Source Hardware Address: " + self.sha
