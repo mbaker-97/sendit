@@ -7,6 +7,8 @@ To Install use pip:
 ```
 pip install sendit==1.0.6
 ```
+Check out the docs:
+[Read the Docs](https://sendit-docs.readthedocs.io/en/latest/)
 ### Sending data over TCP
 
 The general structure is to first create a Raw_NIC - this is a wrapper class around a Python raw socket. 
