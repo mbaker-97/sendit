@@ -8,24 +8,22 @@ __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
 from ipaddress import ip_address, AddressValueError
 from sendit.protocols.udp import UDP
-class UDP_Listener():
+from sendit.handlers.listener import Listener
+class UDP_Listener(Listener):
 
     """
     :param ports: - list of ports to listen on
     :type ports: list of ints
-    :param listeners: default of None, dictionary mapping list of upper \
-        layer listeners to UDP to forward frames to
-    :type listeners: dictionary of listener objects
     """
 
-    def __init__(self, ports, listeners=None):
+    def __init__(self, ports, send_queues = None):
         """
         Constructor for UDP_Listener
         """
         self.ports = ports
-        self.listeners = listeners
+        super().__init__(send_queue=send_queue)
 
-    def listen(self, queue):
+    async def listen(self, queue):
         """
         Listen for frames coming in on queue to parse the UDP objects inside
 
@@ -33,7 +31,7 @@ class UDP_Listener():
         :type queue: Queue object
         """
         while True:
-            frame = queue.get()
+            frame = await self.recv_queue.get()
             frame.payload.payload = UDP.udp_parser(frame.payload.payload, recursive=False)
 
             if frame.payload.payload.dst_prt in ports:

@@ -44,7 +44,6 @@ class Raw_NIC(socket):
         super().send(payload_bytes)
 
 
-#  TODO rewrite send async
 class Async_Raw_NIC(socket):
     """
     Child Class of Socket
@@ -54,14 +53,17 @@ class Async_Raw_NIC(socket):
     :param interface: string name of network interface \
         ex: eth0, wlan0. Not sure? Call ifconfig and look at interface names
     :type interface: String
+    :param queue: asyncio queue to send raw bytes too
+    :type queue: asyncio.Queue
     """
 
-    def __init__(self, interface):
+    def __init__(self, interface, queue):
         """Inits Raw_NIC as raw Socket bound to interface"""
         super().__init__(AF_PACKET, SOCK_RAW, htons(3))
         super().bind((interface, 0))
         # Add for async:
-        super.setblocking(False)
+        super().setblocking(False)
+        self.queue = queue
 
     def send(self, frame, n_bytes):
         """
@@ -81,21 +83,17 @@ class Async_Raw_NIC(socket):
 
         super().send(payload_bytes)
 
-    async def recv(self, n_bytes, queues = None):
+    async def a_recv(self, n_bytes):
         """
         Asynchronously receive bytes
         
-        :param queues: queues to send raw bytes to 
-        :type queue: asyncio.queue
         :param n_bytes: Number of bytes to receive
         :type n_bytes: int
         """
         loop = asyncio.get_event_loop()
 
         while True:
-            byte = await loop.sock_recv(this, n_bytes)
-            if queues is not None:
-                for queue in queues:
-                    await queue.put(byte)
-
+            byte = await loop.sock_recv(self, n_bytes)
+            # Pass on bytes to queue that belongs to bytes_listener
+            await self.queue.put(byte)
 

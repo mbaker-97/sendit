@@ -10,33 +10,36 @@ __status__ = "Development"
 from ipaddress import ip_address, AddressValueError
 from sendit.protocols.ipv4 import IPv4
 from collections import defaultdict
+from sendit.handlers.listener import Listener
 
-
-class IPv4_Listener():
+class IPv4_Listener(Listener):
     """ 
-    :param ips: list of ips to listen for
-    :type ips: list of Strings
-    :param listeners: dictionary mapping list of upper layer listeners to IPv4 \
-            addresses to forward frames to, defaults to None
-    :type listeners: dictionary where keys are strings of IPv4 addresses, \
-            values are Layer 4 protocol listener objects
+    IPv4 Listener that is child class of Listener
+    :param mappings: dictionary mapping MAC addresses to IPv4 addressses \ 
+        defaults to None. 
+    :type mappings: dictionary with String keys and values, defaults to None
+    :param send_queue: asyncio.Queue that will be used to put frames in to send
+    :type send_queue: asyncio.Queue
     """
-    def __init__(self, ips, listeners=None):
+    def __init__(self, queue_mappings=None, send_queue = None):
         """
         Constructor for IPv6_listener
         """
-        for ip in ips:
-            try:
-                ip_address(ip)
-            except AddressValueError:
-                raise ValueError("All keys of mapping dictionary must be valid IPv4 addresses")
-        self.ips = ips
-        self.listeners = listeners
+        if queue_mappings is not None:
+            for ip in queue_mappings.keys():
+                try:
+                    ip_address(ip)
+                except AddressValueError:
+                    raise ValueError("All keys of mapping dictionary must be valid IPv4 addresses")
+
+        super().__init__(send_queue=send_queue)
+        self.queue_mappings = queue_mappings
+
         # This dictionary will map a list of pieces of data to a IP_PacketID
-        self.frag_data = defaultdict(lambda: [0] * 30000)
+        self.frag_data = defaultdict(lambda: [0] * 100000)
 
         # This dictionary will map a list of holes in data to a IP_PacketID
-        self.frag_holes = defaultdict(lambda: [(0, 30000)])
+        self.frag_holes = defaultdict(lambda: [(0, 100000)])
 
     
 
@@ -102,8 +105,8 @@ class IPv4_Listener():
 
 
 
-    # TODO - add in L4 handlers
-    def listen(self, queue):
+    # TODO - logic for layer 4 handlers
+    async def listen(self):
         """
         Listens for frames coming in from queue, placed there by a Layer2 Listener
         If incoming frame contains IPv4 address destination contained in self.ips
@@ -112,18 +115,16 @@ class IPv4_Listener():
         If frames come in with IPv4 fragmented, they are sent to ip_fragmentation_handler
         to be handled
 
-        :param queue: Queue object to listen for incoming frames on
-        :type queue: Queue object
         """
         while True:
-            frame = queue.get()
+            frame = await self.recv_queue.get()
             frame.payload = IPv4.ipv4_parser(frame.payload, recursive=False)
             # Check if the destination is an IP we are looking for
-            if frame.payload.dst in self.ips:
-                # Check if this packet is fragmented
-                if frame.payload.mf or frame.payload.offset != 0:
-                    # Returns only when packet completely pieced back together
-                    frame  = self.ip_fragmentation_handler(frame)
-                print(frame.payload)
+            #  if frame.payload.dst in self.ips:
+                #  # Check if this packet is fragmented
+                #  if frame.payload.mf or frame.payload.offset != 0:
+                    #  # Returns only when packet completely pieced back together
+                    #  frame  = self.ip_fragmentation_handler(frame)
+            print(frame.payload)
                             
 
