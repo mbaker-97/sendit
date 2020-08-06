@@ -5,7 +5,7 @@ Provides easy access to forming and sending custom Ethernet frame, ARP messages,
 
 To Install use pip:
 ```
-pip install sendit==1.0.6
+pip install sendit==1.0.7
 ```
 Check out the docs:
 [Read the Docs](https://sendit-docs.readthedocs.io/en/latest/)
