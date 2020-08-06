@@ -20,7 +20,7 @@ Install with pip
 
 .. code-block:: bash
 
-    pip install sendit==1.0.6
+    pip install sendit==1.0.7
 
 Basics
 ======
