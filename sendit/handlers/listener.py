@@ -15,9 +15,15 @@ class Listener():
     Creates Listener Class. This will serve as parent class to all other listeners
 
     :param send_queue: asyncio.Queue to put frames to be sent in, defaults to None
+    :type send_queue: asyncio.Queue
+    :param incoming_higher_queue: asyncio.Queue that will receive frames from \
+        higher layers that require computation at current layer to be ready to \
+        sent. Will then be passed to send_queue, which will be the lower layer's
+        incoming_higher_queue
+    :type incoming_higher_queue: asyncio.Queue
     """
 
-    def __init__(self, send_queue = None): 
+    def __init__(self, send_queue = None, incoming_higher_queue= None): 
         """Constructor for Listener"""
         # this creates queue to listen on
         self.send_queue = send_queue

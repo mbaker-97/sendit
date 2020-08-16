@@ -20,11 +20,16 @@ class EtherFrame_Listener(Listener):
     :type send_queue: asyncio.Queue
     :param queue_mappings: Dictionary mapping async queues to protocol names, defaults None
     :type queue_mappings: Dictionary where keys are strings of protocol names, values are lists of asyncio.queue
+    :param incoming_higher_queue: asyncio.Queue that will receive frames from \
+        higher layers that require computation at current layer to be ready to \
+        sent. Will then be passed to send_queue, which will be the lower layer's
+        incoming_higher_queue
+    :type incoming_higher_queue: asyncio.Queue
     """
 
-    def __init__(self, queue_mappings=None, send_queue=None): 
+    def __init__(self, queue_mappings=None, send_queue=None, incoming_higher_queue= None): 
         """Constructor for Ethernet_Listener"""
-        super().__init__(send_queue = send_queue)
+        super().__init__(send_queue = send_queue, incoming_higher_queue = incoming_higher_queue)
         # Keys contain protocol names, values contain list of async queues to place frames in
         self.queue_mappings = queue_mappings
 
@@ -85,4 +90,20 @@ class EtherFrame_Listener(Listener):
         :type listener: Protocol Listener Object such as IPv4_Listener,\
                 ARP_Listener, IPv6_Listener
         """
+    async def await_from_higher(self):
+        """
+        Wait for frames from higher layers that needs IPv4 header adjusted
+        Swaps src and destination
+        """
+        frame = await self.incoming_higher_queue.get()
+        # Swap source and destination
+        frame.dst, frame.src = frame.src, frame.dst
+        await self.send_queue.put(frame)
+
+
+
+
+
+
+
 

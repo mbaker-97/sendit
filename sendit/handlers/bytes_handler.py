@@ -27,7 +27,7 @@ class Bytes_Listener(Listener):
     def __init__(self, send_queue=None, queue_mappings=None): 
         """Constructor for Bytes_Listener"""
         # this creates queue to listen on
-        super().__init__(send_queue = send_queue)
+        super().__init__(send_queue=send_queue)
         # Keys contain MACs to send on, values contain list of async queues to place those bytes in 
         self.queue_mappings = queue_mappings 
 
