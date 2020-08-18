@@ -3,50 +3,50 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
 from ipaddress import ip_address, AddressValueError
 from sendit.protocols.ipv6 import IPv6
-from sendit.handlers.listener import Listener
-class IPv6_Listener(Listener):
+from sendit.handlers.handler import Handler
+class IPv6_Handler(Handler):
     """
-    IPv6 Listener that is child class of Listener
-    :param mappings: dictionary mapping MAC addresses to IPv6 addressses \ 
-        defaults to None
-    :type mappings: dictionary with String keys and values, defaults to None
-    :param send_queue: asyncio.Queue that will be used to put frames in to send
-    :type send_queue: asyncio.Queue
-    :param incoming_higher_queue: asyncio.Queue that will receive frames from \
-        higher layers that require computation at current layer to be ready to \
-        sent. Will then be passed to send_queue, which will be the lower layer's
-        incoming_higher_queue
-    :type incoming_higher_queue: asyncio.Queue
+    IPv6 Handler that is child class of Handler
+
+    :param send_up: asyncio.Queue OR dictionary of queues to put items in to go to higher layers
+    :type send_up: asyncio.Queue or dictionary of asyncio.queues
+    :param send_down : asyncio.Queue to put items in to go to lower layers
+    :type send_down: asyncio.Queue
+    :param recv_up: asyncio.Queue to receive items from higher layers
+    :type recv_up: asyncio.Queue
+    :param recv_down: asyncio.Queue to receive items from lower layers
+    :type recv_down: asyncio.Queue
     """
-    def __init__(self, queue_mappings=None, send_queue = None, incoming_higher_queue = None):
+    def __init__(self, send_up=None, send_down=None, recv_up=None, recv_down=None): 
         """
-        Constructor for IPv6_listener
+        Constructor for IPv6_Handler
         """
-        if queue_mappings is not None:
-            for ip in queue_mappings:
-                print(ip)
-                try:
-                    ip_address(ip)
-                except AddressValueError:
-                    raise ValueError("All keys of mapping dictionary must be valid IPv4 addresses")
-        super().__init__(send_queue=send_queue, incoming_higher_queue = incoming_higher_queue)
-        self.queue_mappings = queue_mappings
+        #  if queue_mappings is not None:
+            #  for ip in queue_mappings:
+                #  print(ip)
+                #  try:
+                    #  ip_address(ip)
+                #  except AddressValueError:
+                    #  raise ValueError("All keys of mapping dictionary must be valid IPv4 addresses")
+        super().__init__(send_up=send_up, send_down=send_down, recv_up=recv_up, recv_down=recv_down)
 
     async def listen(self):
         """
         Listen for frames coming in on queue to parse the IPv6 objects inside
         Asynchronous
         """
-        mappings = self.queue_mappings
+        mappings = self.send_up
+        recv_queue = self.recv_down
         while True:
-            frame = await self.recv_queue.get()
+            frame = await recv_queue.get()
             frame.payload = IPv6.ipv6_parser(frame.payload, recursive=False)
+            print(frame.payload)
             if mappings is not None:
                 # Check if there is an entry in self.queue_mappings for l4 protocol
                 queues = mappings.get(frame.payload.protocol.lower())

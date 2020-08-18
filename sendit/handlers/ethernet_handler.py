@@ -3,35 +3,34 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
-from sendit.handlers.listener import Listener
+from sendit.handlers.handler import Handler
 from sendit.helper_functions.helper import *
 import asyncio
 
-class EtherFrame_Listener(Listener):
+class EtherFrame_Handler(Handler):
     """
-    Asynchronously listens for Etherframes in own queue placed there by Bytes_Listener 
+    Asynchronously listens for Etherframes in own queue placed there by Bytes_Handler
     Creates EtherFrames from raw bytes, places those in async queues based on MAC mappings in queue_mappings
 
-    :param send_queue: asyncio.Queue that will be used to put frames in to send
-    :type send_queue: asyncio.Queue
-    :param queue_mappings: Dictionary mapping async queues to protocol names, defaults None
-    :type queue_mappings: Dictionary where keys are strings of protocol names, values are lists of asyncio.queue
-    :param incoming_higher_queue: asyncio.Queue that will receive frames from \
-        higher layers that require computation at current layer to be ready to \
-        sent. Will then be passed to send_queue, which will be the lower layer's
-        incoming_higher_queue
-    :type incoming_higher_queue: asyncio.Queue
+    :param send_up: asyncio.Queue OR dictionary of queues to put items in to go to higher layers, dictionary mapping async queues to protocol names
+    :type send_up: Dictionary where keys are strings in format mac_protocol, values are lists of asyncio.queue, Dictionary where keys are strings in format mac_protocol, values are lists of asyncio.queue
+
+    :param send_down: asyncio.Queue to put items in to go to lower layers
+    :type send_down: asyncio.Queue
+    :param recv_up: asyncio.Queue to receive items from higher layers
+    :type recv_up: asyncio.Queue
+    :param recv_down: asyncio.Queue to receive items from lower layers
+    :type recv_down: asyncio.Queue
     """
 
-    def __init__(self, queue_mappings=None, send_queue=None, incoming_higher_queue= None): 
-        """Constructor for Ethernet_Listener"""
-        super().__init__(send_queue = send_queue, incoming_higher_queue = incoming_higher_queue)
+    def __init__(self, send_up=None, send_down=None, recv_up=None, recv_down=None): 
+        """Constructor for Ethernet_Handler"""
+        super().__init__(send_up=send_up, send_down=send_down, recv_up=recv_up, recv_down=recv_down)
         # Keys contain protocol names, values contain list of async queues to place frames in
-        self.queue_mappings = queue_mappings
 
     async def listen(self):
         """
@@ -40,25 +39,26 @@ class EtherFrame_Listener(Listener):
         Pass that frame on to all queues in corresponding list
         """
         # Grab this into local scope to reduce dictionary lookups
-        mappings = self.queue_mappings
-        recv_queue = self.recv_queue
+        recv_queue = self.recv_down
+        send_queues = self.send_up
 
         while True:
             frame = await recv_queue.get()
             print(frame)
             # Check if queue_mappings was provided
-            if mappings is not None:
+            if send_queues is not None:
                 # Check if destination address is a MAC to be listening for
-                queues = mappings.get(frame.etype)
+                queues = send_queues.get(frame.etype)
                 if queues is not None:
                     for queue in queues:
                         # Await placing bytes in queue
-                        print("Sending to queue {}".format(frame.etype))
+                        #  print("Sending to queue {}".format(frame.etype))
                         await queue.put(frame)
 
+    #TODO
     def remove_protocol(self, protocol):
         """
-        Remove protocol from list of protocols that listener will listen for
+        Remove protocol from list of protocols that handler will handler for
 
         :param protocol: string of protocol to remove
         :type protocol: String
@@ -68,42 +68,46 @@ class EtherFrame_Listener(Listener):
         else:
             raise ValueError("Provided mac address is not valid")
     
+    #TODO
     def remove_queue(self, mac, protocol):
         """
-        Remove upper layer queue from Ethernet_Listener
+        Remove upper layer queue from Ethernet_Handler
 
-        :param mac: string of mac address to remove corresponding listener
+        :param mac: string of mac address to remove corresponding handler
         :type mac: String
-        :param protocol: protocol of listener to remove
+        :param protocol: protocol of handler to remove
         :type protocol: String
         :raise ValueError: if mac not valid MAC address
         """
         pass
 
+    #TODO
     def add_queue(self, mac, queue):
         """
-        Add a higher protocol layer queue into ethernet listener for management
+        Add a higher protocol layer queue into ethernet handler for management
 
         :param mac: mac address to listen on
         :type mac: String
-        :param listener: listener object to add
-        :type listener: Protocol Listener Object such as IPv4_Listener,\
-                ARP_Listener, IPv6_Listener
         """
+        pass
+
     async def await_from_higher(self):
         """
-        Wait for frames from higher layers that needs IPv4 header adjusted
+        Wait for frames from higher layers that needs Ethernet Header adjusted
         Swaps src and destination
         """
-        frame = await self.incoming_higher_queue.get()
-        # Swap source and destination
-        frame.dst, frame.src = frame.src, frame.dst
-        await self.send_queue.put(frame)
+        recv_queue = self.recv_up
+        send_queue = self.send_down
+        while True:
+            frame = await self.recv_queue.get()
 
+            # Swap source and destination
+            # If arp reply, don't use old frame src for new frame dst - this will be
+            # broadcast address
+            if frame.etype == "arp" and frame.payload.op == 2:
+                frame.dst, frame.src = frame.src, frame.payload.sha
+            else:
+                frame.dst, frame.src = frame.src, frame.dst
 
-
-
-
-
-
+            await self.send_down.put(frame)
 

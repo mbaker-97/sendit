@@ -4,32 +4,34 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
 from sendit.protocols.etherframe import EtherFrame
-from sendit.handlers.listener import Listener
+from sendit.handlers.handler import Handler
 import asyncio
 
-class Bytes_Listener(Listener):
+class Bytes_Handler(Handler):
     """
     Asynchronously listens for bytes in own queue placed there by Async_Raw_NIC
     Creates EtherFrames from raw bytes, places those in async queues based on 
     MAC mappings in queue_mappings
 
-    :param send_queue: asyncio.Queue that will be used to put frames in to send
-    :type send_queue: asyncio.Queue
-    :param queue_mappings: Dictionary mapping async queues to MAC addresses, defaults to None
-    :type queue_mappings: Dictionary where keys are strings of MACs, values are lists of asyncio.queue
+    :param send_up: Dictionary where keys are strings of MACs, values are \
+        lists of asyncio.queues where items are put to go to higher layers
+    :type send_up: Dictionary
+    :param send_down : asyncio.Queue to put items in to go to lower layers
+    :type send_down: asyncio.Queue
+    :param recv_up: asyncio.Queue to receive items from higher layers
+    :type recv_up: asyncio.Queue
+    :param recv_down: asyncio.Queue to receive items from lower layers
+    :type recv_down: asyncio.Queue
     """
 
-    def __init__(self, send_queue=None, queue_mappings=None): 
-        """Constructor for Bytes_Listener"""
-        # this creates queue to listen on
-        super().__init__(send_queue=send_queue)
-        # Keys contain MACs to send on, values contain list of async queues to place those bytes in 
-        self.queue_mappings = queue_mappings 
+    def __init__(self, send_up=None, send_down=None, recv_up=None, recv_down=None): 
+        """Constructor for Bytes_Handler"""
+        super().__init__(send_up=send_up, send_down=send_down, recv_up=recv_up, recv_down=recv_down)
 
     async def listen(self):
         """
@@ -39,16 +41,16 @@ class Bytes_Listener(Listener):
         corresponding value in dict
         """
         # Grab this into local scope to reduce dictionary lookups
-        mappings = self.queue_mappings
+        recv_queue = self.recv_down
+        send_queues = self.send_up
         while True:
-            # Wait for bytes to show up in queue
-            byte = await self.recv_queue.get()
-            print("Got bytes in byte receiver")
+            # Wait for bytes to show up in recv_down queue
+            byte = await recv_queue.get()
             frame = EtherFrame.etherframe_parser(byte, recursive=False)
 
-            # Check if queue_mappings was provided
-            if mappings is not None:
-                queues = mappings.get(frame.dst)
+            # Check if send_queues was provided
+            if send_queues is not None:
+                queues = send_queues.get(frame.dst)
                 # Check if destination address is a MAC to be listening for
                 if queues is not None:
 
@@ -70,7 +72,7 @@ class Bytes_Listener(Listener):
             mac = mac.upper()
             # Try to remove that mac from the dictionary
             try:
-                self.queue_mappings.pop(mac)
+                self.send_up.pop(mac)
             # If that key does not exist, raise Value Error
             except KeyError:
                 raise ValueError("That MAC address was not in the current list")
@@ -95,7 +97,7 @@ class Bytes_Listener(Listener):
         # Check if mac is valid
         mac = mac.upper()
         if helper.is_valid_mac(mac):
-            queues = self.queue_mappings.get(mac)
+            queues = self.send_up.get(mac)
 
             # Check if there is entry for that mac in self.queues_mapping
             if queues is None:
@@ -108,7 +110,7 @@ class Bytes_Listener(Listener):
                     # If we removed the last queue for that mac address, remove
                     # MAC in self.queues_mapping
                     if len(queues) == 0:
-                        self.queue_mappings.pop(mac)
+                        self.send_up.pop(mac)
 
                 # If this queue was not in list, raise ValueError
                 except ValueError:
@@ -131,7 +133,7 @@ class Bytes_Listener(Listener):
         # Check if mac is valid
         mac = mac.upper()
         if helper.is_valid_mac(mac):
-            queues = self.queue_mappings.get(mac)
+            queues = self.send_up.get(mac)
 
             # Check if there is entry for that mac in self.queues_mapping
             if queues is None:
@@ -142,3 +144,16 @@ class Bytes_Listener(Listener):
                     queues.append(queue)
         else:
             raise ValueError("Provided MAC address is not valid")
+
+    async def recv_incoming_higher(self):
+        recv_queue = self.recv_up
+        send_queue = self.send_down
+        #TODO - raise error if recv_up, send_down None
+        while True:
+            frame = await self.recv_up.get()
+            try:
+                payload_bytes = frame.as_bytes()
+            except AttributeError:
+                payload_bytes = str.encode(frame)
+
+            await self.send_queue.put(payload_bytes)

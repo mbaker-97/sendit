@@ -3,7 +3,7 @@ to TCP object"""
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -298,7 +298,8 @@ class TCP:
         return pack('!HHIIBBHHH', self.src_prt, self.dst_prt, self.sqn, self.ack_num, offset, flags, self.window, self.checksum, self.urg_pnt) + options[0] + payload
 
 
-    def parse_options(self, option_bytes):
+    @classmethod
+    def parse_options(cls, option_bytes):
         """
         Parses TCP header options from a series of byte
 
@@ -438,10 +439,10 @@ class TCP:
         :return: string of TCP
         :rtype: String
         """
-        header = "*" * 20 + "_UDP_" + "*" * 20
+        header = "*" * 20 + "_TCP_" + "*" * 20
         src = "Source: " + str(self.src_prt)
         dst = "Destination: "  + str(self.dst_prt)
-        length = "Length: " + str(self.length)
+        offset = "Data Offset: " + str(self.offset) + " 32 bit words"
         sqn = "Sequence: " + str(self.sqn)
         ack_num = "Acknowledgment: " + str(self.ack_num)
         flags = "Flags: "
@@ -453,12 +454,11 @@ class TCP:
         syn = "Syn: " + str(self.syn)
         fin = "Fin: " + str(self.fin)
         window = "Window: "  + str(self.window)
-        offset = "Data Offset: " + str(self.offset) + " 32 bit words"
         urg_pnt = "Urgent Pointer: " + str(self.urg_pnt)
 
         trailer = "*" * 45
 
-        return "\n".join((header, src, dst, length, sqn, ack_num, flags, 
+        return "\n".join((header, src, dst, sqn, ack_num, flags, 
             separator, urg, ack, psh, rst, syn, fin, separator, window, offset,
             urg_pnt, trailer))
 

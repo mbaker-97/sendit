@@ -3,12 +3,13 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
 from socket import *
 import asyncio
+from sendit.handlers.handler import Handler
 class Raw_NIC(socket):
     """
     Child Class of Socket
@@ -44,9 +45,9 @@ class Raw_NIC(socket):
         super().send(payload_bytes)
 
 
-class Async_Raw_NIC(socket):
+class Async_Raw_NIC(Handler):
     """
-    Child Class of Socket
+    Child Class of Handler
     Creates Asynchronous Raw Socket, binds to provided interface
     Implements send method that works with rest of library
 
@@ -55,15 +56,22 @@ class Async_Raw_NIC(socket):
     :type interface: String
     :param queue: asyncio queue to send raw bytes too
     :type queue: asyncio.Queue
+    :param queue: asyncio queue to receive outgoing bytes from
+    :type queue: asyncio.Queue
     """
 
-    def __init__(self, interface, queue):
+    def __init__(self, interface, send_up=None, recv_up=None):
         """Inits Raw_NIC as raw Socket bound to interface"""
-        super().__init__(AF_PACKET, SOCK_RAW, htons(3))
-        super().bind((interface, 0))
+        super().__init__(send_up=send_up, recv_up=recv_up)
+
+        self.sock = socket(AF_PACKET, SOCK_RAW, htons(3))
+        self.sock.bind((interface, 0))
         # Add for async:
-        super().setblocking(False)
-        self.queue = queue
+        self.sock.setblocking(False)
+        self.send_up = send_up
+        self.recv_up = recv_up
+        
+
 
     def send(self, frame, n_bytes):
         """
@@ -81,7 +89,7 @@ class Async_Raw_NIC(socket):
         except AttributeError:
           payload_bytes = str.encode(frame)
 
-        super().send(payload_bytes)
+        self.sock.send(payload_bytes)
 
     async def a_recv(self, n_bytes):
         """
@@ -93,7 +101,16 @@ class Async_Raw_NIC(socket):
         loop = asyncio.get_event_loop()
 
         while True:
-            byte = await loop.sock_recv(self, n_bytes)
+            byte = await loop.sock_recv(self.sock, n_bytes)
             # Pass on bytes to queue that belongs to bytes_listener
-            await self.queue.put(byte)
+            await self.send_up.put(byte)
+
+    async def sendall_from_queue(self):
+
+        #TODO 
+        # Assert that self.incoming_higher_queue  is not None
+        # Otherwise raise Assertion Error
+        while True:
+            payload_bytes = await self.incoming_higher_queue.get()
+            await loop.sock_sendall(self.sock, payload_bytes)
 

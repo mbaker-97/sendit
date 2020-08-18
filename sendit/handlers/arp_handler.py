@@ -3,20 +3,20 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
-from sendit.handlers.listener import Listener
+from sendit.handlers.handler import Handler
 from sendit.protocols.arp import ARP
 from sendit.protocols.etherframe import EtherFrame
 from sendit.helper_functions.helper import is_valid_MAC
 from ipaddress import ip_address, AddressValueError
 
-class ARP_Listener(Listener):
+class ARP_Handler(Handler):
     
     """
-    Creates class that listens and responds to ARP messages. Child class of Listener
+    Creates class that listens and responds to ARP messages. Child class of Handler
 
     :param reply: boolean of whether to answer ARP requests, defaults to True
     :type reply: Boolean
@@ -30,9 +30,9 @@ class ARP_Listener(Listener):
         or when values in mappings are not valid MAC addresses
     """
 
-    def __init__(self, reply=True, mappings=None, send_queue=None):
-        """Constructor for ARP_Listener """
-        super().__init__(send_queue=send_queue)
+    def __init__(self, reply=True, mappings=None, send_down=None, recv_up=None):
+        """Constructor for ARP_Handler"""
+        super().__init__(send_down=send_down, recv_up=recv_up)
         if reply and mappings is None:
             raise ValueError("When reply is set  to True, mappings must be provided")
         if reply and send_queue is None:
@@ -59,14 +59,16 @@ class ARP_Listener(Listener):
         an ethernet_handler
 
         """
+        recv_queue = self.recv_up
+        send_queue = self.send_down
         while True:
-            frame = await self.recv_queue.get()
+            frame = await recv_queue.get()
             arp = ARP.arp_parser(frame.payload)
             print(arp)
             if self.reply:
                 mac = self.mappings.get(arp.tpa)
                 if mac is not None and arp.op == 1:
                     reply = ARP(mac, arp.tpa, arp.sha, arp.spa, op=2)
-                    reply_frame = EtherFrame(frame.src, mac, reply, ethertype = "arp")
+                    frame.payload = reply
                     await self.send_queue.put(reply_frame)
             

@@ -4,7 +4,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -13,7 +13,7 @@ import os
 import time
 from sendit.protocols.arp import ARP
 from sendit.protocols.etherframe import EtherFrame
-from sendit.helper_functions.helper import MAC_to_manufacturer,is_valid_ipv4, is_valid_MAC, ip_to_int, get_MAC, get_ip, BROADCAST_MAC
+from sendit.helper_functions.helper import MAC_to_manufacturer,is_valid_ipv4, is_valid_MAC, ip_to_int, get_MAC, get_IP, BROADCAST_MAC
 from sendit.handlers.raw_nic import Raw_NIC
 from socket import inet_ntoa
 from threading import Thread
@@ -164,6 +164,6 @@ if __name__ == "__main__":
     rand_bool = rand.lower() == 'y'
 
     mac = get_MAC(interface)
-    ip = get_ip(interface)
+    ip = get_IP(interface)
 
     ARP_map(network, prefix, interface, mac, ip, rand=rand_bool, delay=delay)

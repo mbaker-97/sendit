@@ -1,36 +1,38 @@
-"""  Creates class that listens and responds to Layer 4 TCP"""
+"""Creates class that listens and responds to Layer 4 TCP"""
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
 from ipaddress import ip_address, AddressValueError
-from sendit.protocols.udp import TCP
-from sendit.handlers.listener import Listener
+from sendit.protocols.tcp import TCP
+from sendit.handlers.handler import Handler
 from os import urandom
 
-class TCP_Listener(Listener):
+class TCP_Handler(Handler):
 
     """
-    :param ports: - list of ports to listen on
+    Class that handles the TCP protocol
+    :param ports: list of ports to listen on
     :type ports: list of ints
-    :param send_queue: queue to put frames in that we want to send, defaults to None
-    :type send_queue: asyncio.queue
-    :param incoming_higher_queue: asyncio.Queue that will receive frames from \
-        higher layers that require computation at current layer to be ready to \
-        sent. Will then be passed to send_queue, which will be the lower layer's
-        incoming_higher_queue
-    :type incoming_higher_queue: asyncio.Queue
-    :param conns: list of ports that this listener already has a connection with, defualts to 0
+    :param conns: list of ports that this handler already has a connection with, defualts to 0
     :type conns: list of tuples in form of (src ip, dst_ip, src_prt, dst_prt)
+    :param send_up: asyncio.Queue OR dictionary of queues to put items in to go to higher layers
+    :type send_up: asyncio.Queue or dictionary of asyncio.queues
+    :param send_down : asyncio.Queue to put items in to go to lower layers
+    :type send_down: asyncio.Queue
+    :param recv_up: asyncio.Queue to receive items from higher layers
+    :type recv_up: asyncio.Queue
+    :param recv_down: asyncio.Queue to receive items from lower layers
+    :type recv_down: asyncio.Queue
     """
 
     # TODO - provide ability to have range of ports
-    def __init__(self, ports, send_queues = None, incoming_higher_queue = None, conns = list()):
+    def __init__(self, ports, send_up=None, send_down=None, recv_up=None, recv_down=None, conns = list()):
         """
-        Constructor for TCP_Listener
+        Constructor for TCP_Handler
         """
         self.ports = ports
         # list of ports that have a full connection
@@ -43,11 +45,11 @@ class TCP_Listener(Listener):
         # TODO - add teardown states
         self.conn_states = dict()
 
-        super().__init__(send_queue=send_queue, incoming_higher_queue = incoming_higher_queue)
+        super().__init__(send_up=send_up, send_down=send_down, recv_up=recv_up, recv_down=recv_down)
 
     # TODO - Find way to determine options
     # TODO - Find way to handle incoming options
-    def handle_handshake(self, frame):
+    async def handle_handshake(self, frame):
         """
         This handles TCP handshake
         :param frame: EtherFrame that contains TCP object to handle 
@@ -119,37 +121,38 @@ class TCP_Listener(Listener):
                 segment.rst, segment.ack = True, False 
 
         if not finished:
-            await self.send_queue.put(frame)
+            await self.send_down.put(frame)
         else:
             # Put some kind of info in queue for higher layer that connection is ready
             pass
 
         
 
-    async def listen(self, queue):
+    async def listen(self):
         """
         Listen for frames coming in on queue to parse the TCP objects inside
 
         :param queue: Queue to listen in on
         :type queue: Queue object
         """
+        recv_queue = self.recv_down
         while True:
-            frame = await self.recv_queue.get()
+            frame = await recv_queue.get()
             packet = frame.payload
             segment = packet.payload
             segment = TCP.tcp_parser(segment, recursive=False)
-            port_num = segment.dst
+            port_num = segment.dst_prt
 
             # Check if we should be listening on this port number
-            if port_num in ports:
-                print(segment)
+            print(segment)
+            if port_num in self.ports:
                 # Check if we have a connection
                 src_ip = packet.src
                 dst_ip = pack.dst
                 src_prt = segment.dst
                 dst_prt = port_num
 
-                connection_descriptor = (src ip, dst_ip, src_prt, dst_prt)
+                connection_descriptor = (src_ip, dst_ip, src_prt, dst_prt)
 
                 if connection_descriptor in self.conns:
                     pass

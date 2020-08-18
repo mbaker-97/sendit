@@ -3,7 +3,7 @@ to IPv4 object"""
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -54,7 +54,6 @@ class IPv4:
         reset_calculated_fields function, will NOT be recalculated when \
         as_bytes is called
     :type checksum: int
-
     """
 
     def __init__(self, src, dst, payload, id=0, length=0, df=False, mf=False, offset=0, ttl=64, protocol="tcp", dscp=0,
@@ -231,7 +230,7 @@ class IPv4:
         source = "Source Address: " + self.src
         dest = "Destination Address: " + self.dst
         length = "Length: " + str(self.length) + " bytes"
-        protocol = "Protocol: " + str(self.protocol)
+        protocol = "Protocol: " + str(self.protocol).upper()
         ttl = "TTL: " + str(self.ttl)
         flags = "Flags: Don't Fragment: " + str(self.df) + " More Fragments: " + str(self.mf)
         offset = "Fragment Offset: " + str(self.offset) + " bytes"

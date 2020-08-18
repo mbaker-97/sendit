@@ -3,7 +3,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -21,9 +21,9 @@ if __name__ == '__main__':
     # ethernet interfaces often in format of eth0
     # wireless interfaces often in format of wlan0
     # To find your MAC: sudo ifconfig <interface> | grep -Eo ..\(\:..\){5}
-    # Or call provided method get_mac(interface)
+    # Or call provided method get_MAC(interface)
     # To find your IP: sudo ifconfig eth0 | grep -w inet | awk '{print $2}'
-    # Or call provided method get_ip(interface)
+    # Or call provided method get_IP(interface)
     # To find your interface name use sudo ifconfig or sudo ip addr show
 
     # Example 1: Standard Usage

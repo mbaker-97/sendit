@@ -2,7 +2,7 @@
 __author__ = "Matt Baker"
 __credits__ = ["Matt Baker"]
 __license__ = "GPL"
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 __maintainer__ = "Matt Baker"
 __email__ = "mbakervtech@gmail.com"
 __status__ = "Development"
@@ -18,8 +18,43 @@ from socket import *
 import pathlib
 BROADCAST_MAC = "FF:FF:FF:FF:FF:FF"
 BROADCAST_IPV4 = "255.255.255.255"
-protocols_to_int = {"icmp": 1, "tcp": 6, "udp": 17, "icmpv6": 58}
-int_to_protocol = {1: "icmp", 6: "tcp", 17: "udp", 58:"icmpv6"}
+def create_ip_protocols_to_int():
+    path = str(pathlib.Path(__file__).parent.absolute())
+    protocols_to_int = dict()
+    with open(path + '/ip_protocols.csv', newline='') as protocols:
+        reader = csv.DictReader(protocols)
+        for row in reader:
+            num = row['Decimal']
+            protocol = row['Keyword']
+            # Change to int, unless it is a range
+            try:
+                num = int(num)
+                protocols_to_int[protocol.lower()] = num
+            except ValueError:
+                range_ints = num.split('-')
+                for i in range(int(range_ints[0]), int(range_ints[1]) + 1):
+                    protocols_to_int[protocol] = i
+        return protocols_to_int
+
+
+def create_ip_int_to_protocols():
+    path = str(pathlib.Path(__file__).parent.absolute())
+    int_to_protocols = dict()
+    with open(path + '/ip_protocols.csv', newline='') as protocols:
+        reader = csv.DictReader(protocols)
+        for row in reader:
+            num = row['Decimal']
+            protocol = row['Keyword']
+            # Change to int, unless it is a range
+            try:
+                num = int(num)
+                int_to_protocols[num] = protocol.lower()
+            except ValueError:
+                range_ints = num.split('-')
+                for i in range(int(range_ints[0]), int(range_ints[1]) + 1):
+                    int_to_protocols[i] = protocol
+        return int_to_protocols
+
 # Brute Force search .... sort csv and FIX!
 def MAC_to_manufacturer(address):
     """
@@ -123,7 +158,7 @@ def get_MAC(interface):
     return val.strip().upper()
 
 
-def get_ip(interface):
+def get_IP(interface):
     """
     Finds IP of a network interface on the host
     Uses UNIX tools ifconfig, grep, and awk
@@ -148,6 +183,33 @@ def get_ip(interface):
 
         sys.exit(1)
     return val.strip()
+
+def get_IPv6(interface):
+    """
+    Finds IPv6 of a network interface on the host
+    Uses UNIX tools ifconfig, grep, and awk
+    Not supported on all Operating Systems
+
+    :param interface: string of the interface to look for
+    :type interface: String
+    :return: string representing MAC address of interface \
+    if OS does not support commands or interface not found, program exits with code 1
+    :rtype: String
+    """
+    try:
+        val = subprocess.check_output("ifconfig " + interface + " | grep -w inet6 | awk '{ print $2}'", shell=True,
+                                      stderr=subprocess.STDOUT).decode('ascii')
+
+    except subprocess.CalledProcessError as e:
+
+        if e.output.decode().find("Device not found") > -1:
+            print(interface + " not found")
+        else:
+            print("Sorry, your Operating System is currently not supported.")
+
+        sys.exit(1)
+    return val.strip()
+
 
 
 # Works with MAC and IPv6
@@ -323,3 +385,12 @@ def form_pseudo_header(src_ip, dst_ip, length, protocol, version=4):
             4, 'big') + ip_protocol.to_bytes(2, 'big')
     else:
         raise ValueError("Invalid version number")
+
+
+
+# define these below the functions they are calling
+protocols_to_int = create_ip_protocols_to_int()
+int_to_protocol = create_ip_int_to_protocols()
+
+
+
